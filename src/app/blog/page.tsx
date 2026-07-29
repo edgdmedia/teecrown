@@ -24,7 +24,7 @@ export default function BlogPage() {
     <PageShell current="Blog">
       {({ openContact }) => (
         <>
-          <PageHero eyebrow="Stories, tips & guides" title="From the Tee'Crown journal" lede="Travel guides, cultural notes and stories from the road — written to help you travel smarter and deeper." />
+          <PageHero eyebrow="Stories, tips & guides" title="From the Tee'Crown journal" lede="Travel guides, cultural notes and stories from the road — written to help you travel smarter and deeper." image="/images/tour-turkey.webp" />
           <Section>
             <Reveal>
               <Link href={`/blog/${feat.slug}`} className="tcc-featpost" style={{ boxShadow: 'var(--shadow-card)', textDecoration: 'none', background: '#fff' }}>
