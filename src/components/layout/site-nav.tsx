@@ -85,7 +85,7 @@ export function SiteNav({ scrolled: scrolledProp, solid, current, onContact }: S
           })}
         </nav>
         <div style={{ alignItems: 'center', gap: '12px', flex: '0 0 auto' }} className="hidden lg:flex">
-          <Button variant="accent" size="sm" onClick={onContact}>Book</Button>
+          <Button variant="accent" size="sm" onClick={onContact}>Reservations</Button>
         </div>
         <button
           aria-label="Menu"
@@ -122,7 +122,7 @@ export function SiteNav({ scrolled: scrolledProp, solid, current, onContact }: S
             );
           })}
           <div style={{ display: 'flex', gap: '12px', marginTop: '14px' }}>
-            <Button variant="accent" size="sm" onClick={() => { setMenuOpen(false); onContact?.(); }} style={{ flex: 1 }}>Book</Button>
+            <Button variant="accent" size="sm" onClick={() => { setMenuOpen(false); onContact?.(); }} style={{ flex: 1 }}>Reservations</Button>
           </div>
         </div>
       )}
