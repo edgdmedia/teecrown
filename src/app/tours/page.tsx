@@ -24,7 +24,7 @@ export default function ToursPage() {
     <PageShell current="Tours">
       {({ openContact }) => (
         <>
-          <PageHero eyebrow="Curated tour packages" title="Where would you like to go?" lede="Handpicked journeys and bespoke itineraries — every detail planned around you, your budget and your dreams." />
+          <PageHero eyebrow="Curated tour packages" title="Where would you like to go?" lede="Handpicked journeys and bespoke itineraries — every detail planned around you, your budget and your dreams." image="/images/hero-dubai.webp" />
           <Section>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-lg)' }}>
               {tags.map((t) => {

@@ -26,6 +26,7 @@ export default function AboutPage() {
             eyebrow="About Tee'Crown"
             title="Travel with people who genuinely care"
             lede="A proudly Nigerian team on a mission to make global travel simple, responsible and unforgettable."
+            image="/images/pilgrimage1.webp"
           />
 
           <Section>

@@ -47,7 +47,7 @@ export default function ServicesPage() {
     <PageShell current="Services">
       {({ openContact }) => (
         <>
-          <PageHero eyebrow="What we do" title="Everything your trip needs, in one place" lede="From the first fare search to the visa stamp in your passport, our consultants carry the load so you can focus on the journey ahead." />
+          <PageHero eyebrow="What we do" title="Everything your trip needs, in one place" lede="From the first fare search to the visa stamp in your passport, our consultants carry the load so you can focus on the journey ahead." image="/images/kenya1.webp" />
           {services.map((s, i) => (
             <Section key={s.title} tint={i % 2 ? 'alt' : undefined}>
               <ServiceRow s={s} flip={i % 2 === 1} onContact={openContact} />
