@@ -30,7 +30,7 @@ export function SiteFooter({ onContact }: SiteFooterProps) {
       <div style={{ maxWidth: 'var(--container-width)', margin: '0 auto', padding: '64px var(--container-padding) 30px' }}>
         <div className="tcc-foot">
           <div>
-            <img src="/images/logo-landscape.webp" alt="Tee'Crown Consult" style={{ height: '46px', width: 'auto', filter: 'brightness(0) invert(1)', marginBottom: '18px' }} />
+            <img src="/logo-landscape.webp" alt="Tee'Crown Consult" style={{ height: '46px', width: 'auto', filter: 'brightness(0) invert(1)', marginBottom: '18px' }} />
             <p style={{ color: 'rgba(255,255,255,0.66)', fontSize: '14px', lineHeight: 1.7, maxWidth: '320px', margin: 0 }}>A wholly indigenous Nigerian travel &amp; tourism company, promoting sustainable and responsible tourism. Your trusted partner for global travel experiences.</p>
             <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
               <SocialIcons />

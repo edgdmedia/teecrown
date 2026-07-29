@@ -57,7 +57,7 @@ export function SiteNav({ scrolled: scrolledProp, solid, current, onContact }: S
         height: isSolid ? '68px' : '84px', transition: 'height .35s ease',
       }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }}>
-          <img src="/images/logo-landscape.webp" alt="Tee'Crown Consult"
+          <img src="/logo-landscape.webp" alt="Tee'Crown Consult"
             style={{ height: '44px', width: 'auto', display: 'block',
               filter: isSolid ? 'none' : 'brightness(0) invert(1)',
               transition: 'filter .35s ease' }}
