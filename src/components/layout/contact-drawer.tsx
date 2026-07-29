@@ -23,7 +23,7 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,11,36,0.55)', backdropFilter: 'blur(3px)', display: 'flex', justifyContent: 'flex-end', animation: 'tccFadeIn .3s ease' }} onClick={onClose}>
-      <div style={{ width: '460px', maxWidth: '100%', height: '100%', background: '#fff', padding: '40px', overflowY: 'auto', position: 'relative', animation: 'tccIn .35s cubic-bezier(.22,.61,.36,1)' }} onClick={(e) => e.stopPropagation()}>
+      <div className="tcc-drawer-pad" style={{ width: '460px', maxWidth: '100%', height: '100%', background: '#fff', padding: '40px', overflowY: 'auto', position: 'relative', animation: 'tccIn .35s cubic-bezier(.22,.61,.36,1)' }} onClick={(e) => e.stopPropagation()}>
         <button onClick={onClose} aria-label="Close" style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '30px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)', width: '40px', height: '40px', borderRadius: '50%', lineHeight: 1, transition: 'all .2s ease' }}
           onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-bg-alt)'; e.currentTarget.style.color = 'var(--color-primary)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--color-text)'; }}
@@ -51,7 +51,7 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
                 onBlur={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
               />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="tcc-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '4px', color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}>Phone</label>
                 <input type="tel" placeholder="080..." style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', transition: 'border-color .3s ease' }}

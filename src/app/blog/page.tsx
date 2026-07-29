@@ -27,8 +27,8 @@ export default function BlogPage() {
           <PageHero eyebrow="Stories, tips & guides" title="From the Tee'Crown journal" lede="Travel guides, cultural notes and stories from the road — written to help you travel smarter and deeper." />
           <Section>
             <Reveal>
-              <Link href={`/blog/${feat.slug}`} style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: '0', borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow-card)', textDecoration: 'none', background: '#fff' }}>
-                <div style={{ overflow: 'hidden', height: '320px' }}>
+              <Link href={`/blog/${feat.slug}`} className="tcc-featpost" style={{ boxShadow: 'var(--shadow-card)', textDecoration: 'none', background: '#fff' }}>
+                <div className="tcc-responsive-img-sm" style={{ overflow: 'hidden', height: '320px' }}>
                   <img src={feat.image} alt={feat.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </div>
                 <div style={{ padding: '44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>

@@ -91,7 +91,7 @@ export function SiteNav({ scrolled: scrolledProp, solid, current, onContact }: S
           aria-label="Menu"
           onClick={() => setMenuOpen(!menuOpen)}
           style={{
-            display: 'none', background: 'none', border: 'none', cursor: 'pointer',
+            background: 'none', border: 'none', cursor: 'pointer',
             padding: '8px', color: isSolid ? 'var(--color-primary)' : '#fff',
             fontSize: '26px', lineHeight: 1,
           }}

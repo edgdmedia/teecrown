@@ -15,7 +15,7 @@ interface CtaBandProps {
 export function CtaBand({ onContact, title = "Ready when you are", text = "Tell us where you're dreaming of. We'll turn it into a real, well-planned journey — usually with a quote back the same day.", cta = "Book Now" }: CtaBandProps) {
   return (
     <Section>
-      <Reveal style={{ position: 'relative', overflow: 'hidden', borderRadius: '18px', background: 'var(--tcc-gradient-cta)', padding: '64px 48px', textAlign: 'center' }}>
+      <Reveal className="tcc-cta-pad" style={{ position: 'relative', overflow: 'hidden', borderRadius: '18px', background: 'var(--tcc-gradient-cta)', padding: '64px 48px', textAlign: 'center' }}>
         <div style={{ position: 'absolute', top: '-40px', right: '-30px', width: '220px', height: '220px', borderRadius: '50%', background: 'rgba(97,206,112,0.18)', filter: 'blur(10px)' }} />
         <div style={{ position: 'relative' }}>
           <Heading light center style={{ maxWidth: '720px', margin: '0 auto' }}>{title}</Heading>

@@ -13,7 +13,7 @@ import { SVC_ICONS } from "@/components/sections/icons";
 function ServiceRow({ s, flip, onContact }: { s: typeof services[0]; flip: boolean; onContact: () => void }) {
   const media = (
     <Reveal style={{ borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow-card-hover)' }}>
-      <img src={s.image} alt={s.title} style={{ width: '100%', height: '400px', objectFit: 'cover', display: 'block' }} />
+      <img src={s.image} alt={s.title} className="tcc-responsive-img" style={{ width: '100%', height: '400px', objectFit: 'cover', display: 'block' }} />
     </Reveal>
   );
   const body = (
