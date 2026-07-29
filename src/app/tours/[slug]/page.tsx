@@ -67,7 +67,7 @@ function Gallery({ p }: { p: typeof packages[0] }) {
     <Section tint="alt">
       <Reveal><Eyebrow center>A glimpse</Eyebrow></Reveal>
       <Reveal delay={60}><Heading center>{p.title} in pictures</Heading></Reveal>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px', marginTop: 'var(--space-lg)' }}>
+      <div className="tcc-gallery" style={{ marginTop: 'var(--space-lg)' }}>
         {imgs.map((src, n) => (
           <Reveal key={src + n} delay={n * 90} style={{ borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow-card)', cursor: 'zoom-in', aspectRatio: '4/3' }}>
             <img

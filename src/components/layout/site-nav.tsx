@@ -57,13 +57,13 @@ export function SiteNav({ scrolled: scrolledProp, solid, current, onContact }: S
         height: isSolid ? '68px' : '84px', transition: 'height .35s ease',
       }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }}>
-          <img src="/images/logo-landscape.png" alt="Tee'Crown Consult"
+          <img src="/logo-landscape.webp" alt="Tee'Crown Consult"
             style={{ height: '44px', width: 'auto', display: 'block',
               filter: isSolid ? 'none' : 'brightness(0) invert(1)',
               transition: 'filter .35s ease' }}
           />
         </Link>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '30px' }} className="max-lg:hidden">
+        <nav style={{ alignItems: 'center', gap: '30px' }} className="hidden lg:flex">
           {links.map((l) => {
             const active = current
               ? current === l.label
@@ -84,14 +84,14 @@ export function SiteNav({ scrolled: scrolledProp, solid, current, onContact }: S
             );
           })}
         </nav>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '0 0 auto' }} className="max-lg:hidden">
+        <div style={{ alignItems: 'center', gap: '12px', flex: '0 0 auto' }} className="hidden lg:flex">
           <Button variant="accent" size="sm" onClick={onContact}>Book</Button>
         </div>
         <button
           aria-label="Menu"
           onClick={() => setMenuOpen(!menuOpen)}
           style={{
-            display: 'none', background: 'none', border: 'none', cursor: 'pointer',
+            background: 'none', border: 'none', cursor: 'pointer',
             padding: '8px', color: isSolid ? 'var(--color-primary)' : '#fff',
             fontSize: '26px', lineHeight: 1,
           }}

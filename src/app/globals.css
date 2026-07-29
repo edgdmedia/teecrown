@@ -155,6 +155,12 @@ a:hover { color: var(--color-accent-dark); }
 @media (max-width: 560px) {
   .tcc-grid-4, .tcc-grid-3, .tcc-foot { grid-template-columns: 1fr !important; }
   .tcc-heropills { display: none !important; }
+  .tcc-responsive-img { height: 240px !important; }
+  .tcc-responsive-img-sm { height: 200px !important; }
+  .tcc-form-row { grid-template-columns: 1fr !important; }
+  .tcc-cta-pad { padding: 40px 20px !important; }
+  .tcc-drawer-pad { padding: 24px 20px !important; }
+  .tcc-gallery { grid-template-columns: 1fr 1fr !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {

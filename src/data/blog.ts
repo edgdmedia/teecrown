@@ -24,4 +24,4 @@ export const blogPosts: BlogPost[] = [
     body: ['While travelling with a child at any age may seem like a daunting prospect, experts claim it can significantly boost their development — expanding their world and building empathy early.', 'New places, sounds and faces stretch a child\'s understanding in ways no classroom can. The lessons are quiet but lasting.', 'With the right planning, family travel becomes not just possible but genuinely joyful — and we specialise in making it smooth for parents.', 'A lifetime of travel often begins with a single, well-planned family trip.'] },
 ];
 
-export const heroSlides = ['/images/hero-dubai.webp', '/images/hero-travel-1.webp', '/images/hero-travel-2.webp', '/images/hero-travel-3.webp'];
+export const heroSlides = ['/images/hero-dubai.webp', '/images/hero-travel-1.webp', '/images/hero-beach.webp', '/images/hero-travel-3.webp'];

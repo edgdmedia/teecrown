@@ -31,7 +31,7 @@ export default function AboutPage() {
           <Section>
             <div className="tcc-split">
               <Reveal style={{ borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow-card-hover)' }}>
-                <img src="/images/kenya1.webp" alt="Our travellers" style={{ width: '100%', height: '460px', objectFit: 'cover', display: 'block' }} />
+                <img src="/images/kenya1.webp" alt="Our travellers" className="tcc-responsive-img" style={{ width: '100%', height: '460px', objectFit: 'cover', display: 'block' }} />
               </Reveal>
               <div>
                 <Reveal><Eyebrow>Who we are</Eyebrow></Reveal>
@@ -51,7 +51,7 @@ export default function AboutPage() {
           <Section tint="alt">
             <Reveal><Eyebrow center>What drives us</Eyebrow></Reveal>
             <Reveal delay={60}><Heading center>Vision & mission</Heading></Reveal>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginTop: 'var(--space-lg)' }}>
+            <div className="tcc-grid-2" style={{ marginTop: 'var(--space-lg)' }}>
               {[
                 { tag: 'Our Vision', title: 'To lead travel & tourism in Africa', text: 'Known across the continent for sustainability, innovation and exceptional customer service — setting the standard for how travel should feel.' },
                 { tag: 'Our Mission', title: 'Memorable journeys, handled with care', text: 'To deliver seamless, personalised travel experiences that are responsible by design, giving every client confidence from first enquiry to safe return.' },
