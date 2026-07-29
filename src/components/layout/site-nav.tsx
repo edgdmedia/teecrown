@@ -63,7 +63,7 @@ export function SiteNav({ scrolled: scrolledProp, solid, current, onContact }: S
               transition: 'filter .35s ease' }}
           />
         </Link>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '30px' }} className="max-lg:hidden">
+        <nav style={{ alignItems: 'center', gap: '30px' }} className="hidden lg:flex">
           {links.map((l) => {
             const active = current
               ? current === l.label
@@ -84,7 +84,7 @@ export function SiteNav({ scrolled: scrolledProp, solid, current, onContact }: S
             );
           })}
         </nav>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '0 0 auto' }} className="max-lg:hidden">
+        <div style={{ alignItems: 'center', gap: '12px', flex: '0 0 auto' }} className="hidden lg:flex">
           <Button variant="accent" size="sm" onClick={onContact}>Book</Button>
         </div>
         <button
