@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
 import { packages } from "@/data/packages";
 import { Container } from "@/components/layout/container";
@@ -32,7 +32,7 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function BookingCard({ p, onContact }: { p: typeof packages[0]; onContact: () => void }) {
+function BookingCard({ p, onContact, pageUrl }: { p: typeof packages[0]; onContact: () => void; pageUrl: string }) {
   return (
     <div style={{ position: 'sticky', top: '90px', background: '#fff', borderRadius: '14px', boxShadow: 'var(--shadow-card-hover)', padding: '30px', border: '1px solid var(--color-border)' }}>
       <div style={{ fontSize: '13px', color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 600 }}>Interested in this trip?</div>
@@ -51,6 +51,23 @@ function BookingCard({ p, onContact }: { p: typeof packages[0]; onContact: () =>
             <span style={{ color: 'var(--color-text-strong)', fontWeight: 600, textAlign: 'right' }}>{v}</span>
           </div>
         ))}
+      </div>
+      <div style={{ borderTop: '1px solid var(--color-border)', marginTop: '22px', paddingTop: '18px' }}>
+        <div style={{ fontSize: '12px', color: 'var(--color-text-light)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Share</div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`} target="_blank" rel="noopener noreferrer" title="Facebook" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-bg-alt)', color: 'var(--color-primary)', textDecoration: 'none' }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '18px', height: '18px' }}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2Z"/></svg>
+          </a>
+          <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(p.title)}`} target="_blank" rel="noopener noreferrer" title="X" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-bg-alt)', color: 'var(--color-primary)', textDecoration: 'none' }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '18px', height: '18px' }}><path d="M4 4l6.2 8.3L4 20h2.3l5-5.6L15.7 20H20l-6.7-9.2L19.5 4h-2.3l-4.6 5.4L8 4H4Z"/></svg>
+          </a>
+          <a href={`https://wa.me/?text=${encodeURIComponent(p.title + ' - ' + pageUrl + '\n\n' + 'https://teecrownconsult.org' + p.image)}`} target="_blank" rel="noopener noreferrer" title="WhatsApp" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-bg-alt)', color: 'var(--color-primary)', textDecoration: 'none' }}>
+            <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: '18px', height: '18px' }}><path d="M17.472 14.382c-.297-.149-1.757-.867-2.03-.967-.273-.099-.473-.149-.672.15-.2.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.76-1.653-2.059-.173-.298-.018-.46.13-.61.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.672-1.62-.922-2.219-.242-.579-.487-.5-.672-.51-.173-.01-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.298-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+          <a href={`mailto:?subject=${encodeURIComponent(p.title)}&body=${encodeURIComponent('Check out this tour: ' + p.title + '\n\n' + pageUrl)}`} target="_blank" rel="noopener noreferrer" title="Email" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-bg-alt)', color: 'var(--color-primary)', textDecoration: 'none' }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '18px', height: '18px' }}><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -105,6 +122,8 @@ function RelatedTours({ slug }: { slug: string }) {
 
 export default function TourDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const pathname = usePathname();
+  const pageUrl = `https://teecrownconsult.org${pathname}`;
   const pkg = packages.find((p) => p.slug === slug);
 
   if (!pkg) {
@@ -212,7 +231,7 @@ export default function TourDetailPage() {
                   </Reveal>
                 )}
               </div>
-              <BookingCard p={pkg} onContact={openContact} />
+              <BookingCard p={pkg} onContact={openContact} pageUrl={pageUrl} />
             </div>
           </Section>
           <Gallery p={pkg} />
