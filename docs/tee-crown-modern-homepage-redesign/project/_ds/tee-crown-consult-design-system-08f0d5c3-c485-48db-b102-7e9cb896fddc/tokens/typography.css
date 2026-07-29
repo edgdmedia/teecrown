@@ -1,0 +1,34 @@
+/* === Tee'Crown Consult — Typography tokens ===
+   DM Sans carries everything; Roboto is the secondary/utility face used for
+   nav labels and the editorial dropcap. Headings are always navy + bold. */
+:root {
+  --font-primary: 'DM Sans', system-ui, sans-serif;   /* body + headings */
+  --font-secondary: 'Roboto', system-ui, sans-serif;  /* nav labels, dropcap */
+  --font-accent: 'Trebuchet MS', 'DM Sans', sans-serif; /* buttons + hero subtitle */
+
+  /* Type scale (desktop) — matches the Elementor global kit */
+  --fs-base: 16px;
+  --fs-small: 14px;
+  --fs-body: 16px;
+  --fs-h6: 18px;
+  --fs-h5: 20px;
+  --fs-h4: 24px;
+  --fs-h3: 28px;
+  --fs-h2: 36px;
+  --fs-h1: 48px;
+  --fs-display: 55px;  /* hero title */
+
+  /* Weights */
+  --fw-regular: 400; /* @kind font */
+  --fw-medium: 500; /* @kind font */
+  --fw-semibold: 600; /* @kind font */
+  --fw-bold: 700; /* @kind font */
+
+  /* Line heights */
+  --lh-tight: 1.2; /* @kind font */
+  --lh-body: 1.6; /* @kind font */
+  --lh-relaxed: 1.8; /* @kind font */
+
+  /* Letter spacing */
+  --ls-nav: 0.5px;   /* uppercase nav + eyebrows */
+}

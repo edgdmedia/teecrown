@@ -1,0 +1,31 @@
+/* === Tee'Crown Consult — Spacing, radius, shadow, layout tokens === */
+:root {
+  /* Spacing scale */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 48px;
+  --space-xl: 80px;
+
+  /* Radius */
+  --radius: 8px;          /* content cards */
+  --radius-btn: 5px;      /* buttons + inputs (Elementor default) */
+  --radius-pill: 20px;    /* category chips */
+  --radius-full: 9999px;
+
+  /* Elevation — soft, cool shadows */
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-card-hover: 0 8px 30px rgba(0,0,0,0.12);
+  --shadow-header: 0 2px 10px rgba(0,0,0,0.05);
+
+  /* Motion */
+  --transition: 0.3s ease; /* @kind other */
+
+  /* Layout */
+  --container-width: 1140px;
+  --container-padding: 20px;
+  --header-height: 80px;
+  --hero-min-height: 447px;  /* home hero */
+  --band-min-height: 331px;  /* testimonial photo band */
+  --section-pad: 50px;       /* Elementor section vertical padding */
+}

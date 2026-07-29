@@ -1,0 +1,52 @@
+/* === Tee'Crown Consult — Color tokens ===
+   Navy is the brand spine; a fresh leaf-green is the single action accent. */
+:root {
+  /* Brand — primary navy */
+  --tcc-navy: #000080;
+  --tcc-navy-dark: #000060;
+  --tcc-ink: #000B24; /* deepest navy, used for footers + gradient tails */
+  --tcc-navy-overlay: #040452; /* hero/testimonial photo scrim tint */
+
+  /* Brand — accent green */
+  --tcc-green: #61CE70;
+  --tcc-green-dark: #4AB85A;
+
+  /* Neutrals */
+  --tcc-white: #FFFFFF;
+  --tcc-bg: #FFFFFF;
+  --tcc-bg-alt: #F5F5F5;
+  --tcc-border: #E0E0E0;
+  --tcc-text: #7A7A7A;        /* default body copy (Elementor "text") */
+  --tcc-text-strong: #54595F; /* darker grey (Elementor "secondary") */
+  --tcc-text-light: #AAAAAA;   /* muted meta grey */
+  --tcc-slate: #5A6478;        /* CTA panel slate blue-grey */
+  --tcc-tint-blue: #DBE6FF52;  /* translucent light-blue section wash */
+
+  /* Semantic — status */
+  --tcc-star: #F0AD4E;      /* rating stars */
+  --tcc-success-bg: #D4EDDA;
+  --tcc-success-fg: #155724;
+
+  /* === Semantic aliases === */
+  --color-primary: var(--tcc-navy);
+  --color-primary-dark: var(--tcc-navy-dark);
+  --color-accent: var(--tcc-green);
+  --color-accent-dark: var(--tcc-green-dark);
+  --color-heading: var(--tcc-navy);
+  --color-text: var(--tcc-text);
+  --color-text-strong: var(--tcc-text-strong);
+  --color-text-light: var(--tcc-text-light);
+  --color-bg: var(--tcc-bg);
+  --color-bg-alt: var(--tcc-bg-alt);
+  --color-bg-dark: var(--tcc-ink);
+  --color-border: var(--tcc-border);
+  --color-white: var(--tcc-white);
+
+  /* Signature gradient — navy → ink, used on heroes + CTA bands */
+  --tcc-gradient-hero: linear-gradient(135deg, rgba(0,0,128,0.75), rgba(0,11,36,0.85)); /* @kind color */
+  --tcc-gradient-cta: linear-gradient(135deg, var(--tcc-navy), var(--tcc-ink)); /* @kind color */
+  /* Photo scrim — solid navy tint used over hero + testimonial photos */
+  --tcc-scrim-hero: rgba(4,4,82,0.42); /* @kind color */
+  --tcc-scrim-testimonial: rgba(0,0,128,0.55); /* @kind color */
+  --tcc-gradient-overlay-card: linear-gradient(to top, rgba(0,11,36,0.82) 0%, rgba(0,11,36,0.15) 55%, rgba(0,11,36,0) 100%); /* @kind color */
+}
