@@ -24,11 +24,19 @@ Terminal 2: `cd .. && NEXT_PUBLIC_PAYLOAD_URL=http://localhost:3000 npx next dev
 
 Frontend at :3001 fetches from local CMS.
 
+## Email
+
+Configured via `@payloadcms/email-nodemailer` — uses SMTP env vars (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`).
+When `SMTP_HOST` is empty (local default), Payload logs emails to console instead of sending — no warning.
+
+For local testing with real email capture, set up [Mailtrap](https://mailtrap.io) and put their SMTP creds in `.env`.
+For production, use SendGrid, Mailgun, Resend, etc. via their SMTP credentials.
+
 ## Seeding
 
 The first visit to `/admin` auto-pushes schema to local DB (`push: true` in dev).
 Create the first admin user at `/admin`, then run:
 ```bash
-npx ts-node scripts/seed.ts   # from client-cms/
+npx ts-node src/scripts/seed.ts   # from client-cms/
 ```
 <!-- END:payload-cms -->
