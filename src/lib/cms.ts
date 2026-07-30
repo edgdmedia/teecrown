@@ -3,10 +3,10 @@
 
 import { packages as staticPackages } from '@/data/packages'
 import { blogPosts as staticPosts } from '@/data/blog'
-import { services as staticServices } from '@/data/services'
-import type { Package, PricingRow, ItineraryDay, PackageContent } from '@/data/packages'
+import { testimonials as staticTestimonials } from '@/data/testimonials'
+import type { Package, PricingRow, ItineraryDay } from '@/data/packages'
 import type { BlogPost } from '@/data/blog'
-import type { Service } from '@/data/services'
+import type { Testimonial } from '@/data/testimonials'
 
 const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || ''
 
@@ -61,35 +61,45 @@ function mapCmsPost(doc: Record<string, unknown>): BlogPost {
   }
 }
 
-function mapCmsService(doc: Record<string, unknown>): Service {
+function mapCmsTestimonial(doc: Record<string, unknown>): Testimonial {
   return {
-    icon: '',
+    rating: Number(doc.rating ?? 5),
+    name: doc.name as string,
     title: doc.title as string,
-    image: imgUrl(doc.image as CmsMedia | undefined),
-    description: doc.description as string,
-    details: ((doc.details as { item?: string }[] | undefined)?.map(d => d.item ?? '') ?? []),
+    text: doc.text as string,
   }
 }
 
-async function fetchCms<T>(slug: string, params?: string): Promise<T[] | null> {
-  if (!PAYLOAD_URL) return null
+async function fetchCmsCollection<T>(opts: {
+  slug: string
+  params?: string
+  fallback: T[]
+  map: (doc: Record<string, unknown>) => T
+}): Promise<T[]> {
+  if (!PAYLOAD_URL) return opts.fallback
   try {
     const res = await fetch(
-      `${PAYLOAD_URL}/api/${slug}${params ? '?' + params : ''}`,
-      { next: { revalidate: 300, tags: [slug] } }
+      `${PAYLOAD_URL}/api/${opts.slug}${opts.params ? '?' + opts.params : ''}`,
+      { next: { revalidate: 300, tags: [opts.slug] } }
     )
-    if (!res.ok) return null
+    if (!res.ok) return opts.fallback
     const { docs } = await res.json()
-    return docs ?? null
-  } catch { return null }
+    if (!Array.isArray(docs)) return opts.fallback
+    return docs.map(opts.map)
+  } catch {
+    return opts.fallback
+  }
 }
 
 // ── Exports ──────────────────────────────────────────────────────
 
 export async function getTourPackages(): Promise<Package[]> {
-  const docs = await fetchCms<Record<string, unknown>>('tour-packages', 'depth=2')
-  if (!docs) return staticPackages
-  return docs.map(mapCmsPackage)
+  return fetchCmsCollection({
+    slug: 'tour-packages',
+    params: 'depth=2',
+    fallback: staticPackages,
+    map: mapCmsPackage,
+  })
 }
 
 export async function getTourPackage(slug: string): Promise<Package | undefined> {
@@ -98,9 +108,12 @@ export async function getTourPackage(slug: string): Promise<Package | undefined>
 }
 
 export async function getPosts(): Promise<BlogPost[]> {
-  const docs = await fetchCms<Record<string, unknown>>('posts', 'depth=1')
-  if (!docs) return staticPosts
-  return docs.map(mapCmsPost)
+  return fetchCmsCollection({
+    slug: 'posts',
+    params: 'depth=1',
+    fallback: staticPosts,
+    map: mapCmsPost,
+  })
 }
 
 export async function getPost(slug: string): Promise<BlogPost | undefined> {
@@ -108,8 +121,10 @@ export async function getPost(slug: string): Promise<BlogPost | undefined> {
   return all.find(p => p.slug === slug)
 }
 
-export async function getServices(): Promise<Service[]> {
-  const docs = await fetchCms<Record<string, unknown>>('services', 'depth=1')
-  if (!docs) return staticServices
-  return docs.map(mapCmsService)
+export async function getTestimonials(): Promise<Testimonial[]> {
+  return fetchCmsCollection({
+    slug: 'testimonials',
+    fallback: staticTestimonials,
+    map: mapCmsTestimonial,
+  })
 }

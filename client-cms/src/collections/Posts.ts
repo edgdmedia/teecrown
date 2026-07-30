@@ -3,7 +3,12 @@ import type { CollectionConfig } from 'payload'
 export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: { useAsTitle: 'title', group: 'Content' },
-  access: { read: () => true },
+  access: {
+    read: () => true,
+    create: ({ req }) => Boolean(req.user),
+    update: ({ req }) => Boolean(req.user),
+    delete: ({ req }) => req.user?.roles?.includes('admin') ?? false,
+  },
   fields: [
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true, unique: true },

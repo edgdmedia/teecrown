@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { blogPosts } from "@/data/blog";
+import type { BlogPost } from "@/data/blog";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/motion/reveal";
@@ -36,8 +36,8 @@ function CarArrow({ dir, onClick, disabled }: { dir: 'prev' | 'next'; onClick: (
   );
 }
 
-export function StoriesSection() {
-  const d = blogPosts;
+export function StoriesSection({ posts }: { posts: BlogPost[] }) {
+  const d = posts;
   const c = useCarousel(d.length);
   const step = 100 / c.perView;
 

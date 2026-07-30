@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { PageShell } from "@/components/layout/page-shell";
-import { services as staticServices } from "@/data/services";
-import { getServices } from "@/lib/cms";
+import { services } from "@/data/services";
 import { Section } from "@/components/layout/section";
 import { PageHero } from "@/components/layout/page-hero";
 import { Reveal } from "@/components/motion/reveal";
@@ -12,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { CtaBand } from "@/components/layout/cta-band";
 import { SVC_ICONS } from "@/components/sections/icons";
 
-function ServiceRow({ s, flip, onContact }: { s: typeof staticServices[0]; flip: boolean; onContact: () => void }) {
+function ServiceRow({ s, flip, onContact }: { s: typeof services[0]; flip: boolean; onContact: () => void }) {
   const media = (
     <Reveal style={{ borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow-card-hover)' }}>
       <img src={s.image} alt={s.title} className="tcc-responsive-img" style={{ width: '100%', height: '400px', objectFit: 'cover', display: 'block' }} />
@@ -45,15 +43,12 @@ function ServiceRow({ s, flip, onContact }: { s: typeof staticServices[0]; flip:
 }
 
 export default function ServicesPage() {
-  const [svcs, setSvcs] = useState(staticServices);
-  useEffect(() => { getServices().then(d => { if (d.length) setSvcs(d) }) }, []);
-
   return (
     <PageShell current="Services">
       {({ openContact }) => (
         <>
           <PageHero eyebrow="What we do" title="Everything your trip needs, in one place" lede="From the first fare search to the visa stamp in your passport, our consultants carry the load so you can focus on the journey ahead." image="/images/kenya1.webp" />
-          {svcs.map((s, i) => (
+          {services.map((s, i) => (
             <Section key={s.title} tint={i % 2 ? 'alt' : undefined}>
               <ServiceRow s={s} flip={i % 2 === 1} onContact={openContact} />
             </Section>

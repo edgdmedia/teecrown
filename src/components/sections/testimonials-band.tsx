@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { testimonials } from "@/data/testimonials";
+import type { Testimonial } from "@/data/testimonials";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/motion/reveal";
 import { Container } from "@/components/layout/container";
 
-export function TestimonialsBand() {
+export function TestimonialsBand({ testimonials }: { testimonials: Testimonial[] }) {
   const d = testimonials;
   const [i, setI] = useState(0);
   useEffect(() => {

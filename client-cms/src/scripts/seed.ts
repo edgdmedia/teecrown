@@ -107,6 +107,7 @@ async function main() {
   const seedPosts = seedAll || args.includes('posts')
   const seedPackages = seedAll || args.includes('packages')
   const seedServices = seedAll || args.includes('services')
+  const seedTestimonials = seedAll || args.includes('testimonials')
 
   // 1. Upload all images first ──────────────────────────────────────
   const mediaMap: MediaMap = {}
@@ -114,6 +115,7 @@ async function main() {
   const { blogPosts } = await import('../../../src/data/blog')
   const { packages } = await import('../../../src/data/packages')
   const { services } = await import('../../../src/data/services')
+  const { testimonials } = await import('../../../src/data/testimonials')
 
   const allImages: string[] = [
     ...blogPosts.map(p => getFilename(p.image)),
@@ -218,6 +220,20 @@ async function main() {
       })
       if (!res.ok) console.error(`  FAIL service ${s.title}:`, res.status, await res.text())
       else console.log(`  OK   service: ${s.title}`)
+    }
+  }
+
+  if (seedTestimonials) {
+    console.log(`\nSeeding ${testimonials.length} testimonials...`)
+    await dropCollection('testimonials', headers)
+    for (const t of testimonials) {
+      const res = await fetch(`${PAYLOAD_URL}/api/testimonials`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(t),
+      })
+      if (!res.ok) console.error(`  FAIL testimonial ${t.name}:`, res.status, await res.text())
+      else console.log(`  OK   testimonial: ${t.name}`)
     }
   }
 

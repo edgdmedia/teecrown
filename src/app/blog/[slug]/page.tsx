@@ -9,11 +9,18 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const revalidate = 300;
+
 async function loadPost(slug: string) {
   const all = await getPosts().catch(() => staticPosts);
   const p = all.find((b) => b.slug === slug) || staticPosts.find((b) => b.slug === slug);
   const related = all.filter((x) => x.slug !== slug).slice(0, 3);
   return { post: p, related, all };
+}
+
+export async function generateStaticParams() {
+  const posts = await getPosts().catch(() => staticPosts);
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {

@@ -6,20 +6,26 @@ import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { TourPackages } from './collections/TourPackages'
 import { Services } from './collections/Services'
+import { Testimonials } from './collections/Testimonials'
 import { Media } from './collections/Media'
 import { Users } from './collections/Users'
 import { ContactSubmissions } from './collections/ContactSubmissions'
 
 const config: Parameters<typeof buildConfig>[0] = {
   admin: { user: Users.slug },
-  collections: [Users, Pages, Posts, TourPackages, Services, Media, ContactSubmissions],
+  collections: [Users, Pages, Posts, TourPackages, Services, Testimonials, Media, ContactSubmissions],
   editor: lexicalEditor({}),
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URI ?? '' },
     push: process.env.NODE_ENV !== 'production',
   }),
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+  cookiePrefix: 'payload',
   cors: process.env.CORS_ORIGINS?.split(',') ?? [],
-  csrf: process.env.CORS_ORIGINS?.split(',') ?? [],
+  csrf: [
+    process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+    ...(process.env.CORS_ORIGINS?.split(',') ?? []),
+  ],
   secret: process.env.PAYLOAD_SECRET ?? '',
 }
 
