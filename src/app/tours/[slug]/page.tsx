@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
-import { packages } from "@/data/packages";
+import { packages as staticPackages } from "@/data/packages";
+import { getTourPackages } from "@/lib/cms";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { Reveal } from "@/components/motion/reveal";
@@ -16,6 +17,7 @@ import { CtaBand } from "@/components/layout/cta-band";
 import { waLink } from "@/data/contact";
 import { IncludeIcon } from "@/components/ui/include-icons";
 import { Lightbox } from "@/components/ui/lightbox";
+import { LexicalRenderer } from "@/components/ui/lexical-renderer";
 
 function ListBlock({ title, items }: { title: string; items: string[] }) {
   return (
@@ -32,7 +34,7 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function BookingCard({ p, onContact, pageUrl }: { p: typeof packages[0]; onContact: () => void; pageUrl: string }) {
+function BookingCard({ p, onContact, pageUrl }: { p: typeof staticPackages[0]; onContact: () => void; pageUrl: string }) {
   return (
     <div style={{ position: 'sticky', top: '90px', background: '#fff', borderRadius: '14px', boxShadow: 'var(--shadow-card-hover)', padding: '30px', border: '1px solid var(--color-border)' }}>
       <div style={{ fontSize: '13px', color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 600 }}>Interested in this trip?</div>
@@ -73,7 +75,7 @@ function BookingCard({ p, onContact, pageUrl }: { p: typeof packages[0]; onConta
   );
 }
 
-function Gallery({ p }: { p: typeof packages[0] }) {
+function Gallery({ p }: { p: typeof staticPackages[0] }) {
   const imgs = p.gallery;
   const [lbOpen, setLbOpen] = useState(false);
   const [lbIdx, setLbIdx] = useState(0);
@@ -100,8 +102,8 @@ function Gallery({ p }: { p: typeof packages[0] }) {
   );
 }
 
-function RelatedTours({ slug }: { slug: string }) {
-  const rel = packages.filter((x) => x.slug !== slug).slice(0, 3);
+function RelatedTours({ slug, all }: { slug: string; all: typeof staticPackages }) {
+  const rel = all.filter((x) => x.slug !== slug).slice(0, 3);
   return (
     <Section tint="alt">
       <Reveal><Eyebrow center>Keep exploring</Eyebrow></Reveal>
@@ -124,7 +126,10 @@ export default function TourDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const pathname = usePathname();
   const pageUrl = `https://teecrownconsult.org${pathname}`;
-  const pkg = packages.find((p) => p.slug === slug);
+  const [allPkgs, setAllPkgs] = useState(staticPackages);
+  const pkg = allPkgs.find((p) => p.slug === slug);
+
+  useEffect(() => { getTourPackages().then(d => { if (d.length) setAllPkgs(d) }) }, []);
 
   if (!pkg) {
     return (
@@ -164,9 +169,7 @@ export default function TourDetailPage() {
             <div className="tcc-detail" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '48px', alignItems: 'start' }}>
               <div>
                 <Reveal><Eyebrow>Overview</Eyebrow></Reveal>
-                {pkg.content.intro.map((para, i) => (
-                  <Reveal key={i} delay={i * 60}><p style={{ fontSize: '16.5px', lineHeight: 1.8, color: 'var(--color-text)', marginTop: i ? '16px' : '10px' }}>{para}</p></Reveal>
-                ))}
+                {pkg.content.intro && <Reveal><LexicalRenderer data={pkg.content.intro} /></Reveal>}
 
                 {pkg.content.pricing && (
                   <Reveal>
@@ -235,7 +238,7 @@ export default function TourDetailPage() {
             </div>
           </Section>
           <Gallery p={pkg} />
-          <RelatedTours slug={pkg.slug} />
+          <RelatedTours slug={pkg.slug} all={allPkgs} />
           <CtaBand onContact={openContact} title="Ready to make it real?" text={`Let's tailor the ${pkg.title} experience to your exact dates, group size and budget.`} cta="Book Now" />
         </>
       )}

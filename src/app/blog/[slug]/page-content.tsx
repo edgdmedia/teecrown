@@ -12,6 +12,7 @@ import { Heading } from "@/components/ui/heading";
 import { Badge } from "@/components/ui/badge";
 import { BlogCard } from "@/components/cards/blog-card";
 import { Button } from "@/components/ui/button";
+import { LexicalRenderer } from "@/components/ui/lexical-renderer";
 
 export function BlogDetailContent({ post, related }: { post: BlogPost; related: BlogPost[] }) {
   const pathname = usePathname();
@@ -36,14 +37,7 @@ export function BlogDetailContent({ post, related }: { post: BlogPost; related: 
           <Section>
             <div style={{ maxWidth: '760px', margin: '0 auto' }}>
               <Reveal><p style={{ fontSize: '20px', lineHeight: 1.7, color: 'var(--color-text-strong)', fontWeight: 500, margin: '0 0 28px' }}>{post.excerpt}</p></Reveal>
-              {post.body.map((para, i) => (
-                <Reveal key={i} delay={i * 40}>
-                  <p style={{ fontSize: '17px', lineHeight: 1.85, color: 'var(--color-text)', margin: '0 0 22px' }}>
-                    {i === 0 && <span style={{ fontFamily: 'var(--font-secondary)', fontSize: '58px', fontWeight: 700, float: 'left', lineHeight: 0.82, margin: '6px 14px 0 0', color: 'var(--color-primary)' }}>{para[0]}</span>}
-                    {i === 0 ? para.slice(1) : para}
-                  </p>
-                </Reveal>
-              ))}
+              {post.body && <Reveal><LexicalRenderer data={post.body} /></Reveal>}
               <Reveal>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '36px', padding: '26px 30px', background: 'var(--tcc-tint-blue)', borderRadius: 'var(--radius)' }}>
                   <div style={{ flex: '1 1 240px' }}>

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageShell } from "@/components/layout/page-shell";
-import { packages } from "@/data/packages";
+import { packages as staticPackages } from "@/data/packages";
+import { getTourPackages } from "@/lib/cms";
 import { Section } from "@/components/layout/section";
 import { PageHero } from "@/components/layout/page-hero";
 import { Reveal } from "@/components/motion/reveal";
@@ -13,12 +14,13 @@ import { PackageCard } from "@/components/cards/package-card";
 import { Button } from "@/components/ui/button";
 import { CtaBand } from "@/components/layout/cta-band";
 
-const allPackages = packages;
-const tags = ['All', ...Array.from(new Set(allPackages.map((p) => p.tag)))];
-
 export default function ToursPage() {
+  const [allPackages, setAllPackages] = useState(staticPackages);
   const [tag, setTag] = useState('All');
+  const tags = ['All', ...Array.from(new Set(allPackages.map((p) => p.tag)))];
   const shown = tag === 'All' ? allPackages : allPackages.filter((p) => p.tag === tag);
+
+  useEffect(() => { getTourPackages().then(d => { if (d.length) setAllPackages(d) }) }, []);
 
   return (
     <PageShell current="Tours">

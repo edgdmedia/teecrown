@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
-import { blogPosts } from "@/data/blog";
+import { blogPosts as staticPosts } from "@/data/blog";
+import { getPosts } from "@/lib/cms";
 import { Section } from "@/components/layout/section";
 import { PageHero } from "@/components/layout/page-hero";
 import { Reveal } from "@/components/motion/reveal";
@@ -11,14 +12,15 @@ import { Badge } from "@/components/ui/badge";
 import { BlogCard } from "@/components/cards/blog-card";
 import { CtaBand } from "@/components/layout/cta-band";
 
-const posts = blogPosts;
-const feat = posts[0];
-const rest = posts.slice(1);
-const cats = ['All', ...Array.from(new Set(rest.map((p) => p.category)))];
-
 export default function BlogPage() {
+  const [posts, setPosts] = useState(staticPosts);
   const [cat, setCat] = useState('All');
+  const feat = posts[0];
+  const rest = posts.slice(1);
+  const cats = ['All', ...Array.from(new Set(rest.map((p) => p.category)))];
   const shown = cat === 'All' ? rest : rest.filter((p) => p.category === cat);
+
+  useEffect(() => { getPosts().then(d => { if (d.length) setPosts(d) }) }, []);
 
   return (
     <PageShell current="Blog">
