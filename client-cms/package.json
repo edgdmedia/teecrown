@@ -3,22 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "payload dev",
-    "build": "payload build",
-    "start": "payload start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "migrate:create": "payload migrate:create",
     "migrate": "payload migrate"
   },
   "dependencies": {
-    "payload": "latest",
-    "@payloadcms/db-postgres": "latest",
-    "@payloadcms/richtext-lexical": "latest",
-    "@payloadcms/next": "latest",
-    "next": "15",
-    "react": "^18",
-    "react-dom": "^18"
+    "next": "16.2.12",
+    "payload": "3.85.0",
+    "@payloadcms/next": "3.85.0",
+
+    "@payloadcms/db-postgres": "3.85.0",
+    "@payloadcms/richtext-lexical": "3.85.0",
+    "@payloadcms/ui": "3.85.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "typescript": "^5",
+    "@types/react": "^19",
+    "@types/node": "^20"
   }
 }
