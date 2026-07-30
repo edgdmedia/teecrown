@@ -4,10 +4,11 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { Pages } from './collections/Pages'
 import { Media } from './collections/Media'
 import { Users } from './collections/Users'
+import { ContactSubmissions } from './collections/ContactSubmissions'
 
 export default buildConfig({
   admin: { user: Users.slug },
-  collections: [Users, Pages, Media],
+  collections: [Users, Pages, Media, ContactSubmissions],
   editor: lexicalEditor({}),
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URI ?? '' },

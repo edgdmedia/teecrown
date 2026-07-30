@@ -1,5 +1,6 @@
 import { DM_Sans, Roboto } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@/components/layout/analytics";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", display: "swap" });
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-roboto", weight: ["300","400","500","700"], display: "swap" });
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${dmSans.variable} ${roboto.variable}`}>
       <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-primary)' }}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
