@@ -1,3 +1,14 @@
+# Requires these GitHub repository secrets:
+#   VPS_HOST         — VPS IP or hostname
+#   VPS_USER         — SSH username
+#   VPS_SSH_KEY      — private SSH key (deploy key on VPS)
+#   VPS_PROJECT_PATH — absolute path to client-cms/ on VPS, e.g. /home/user/client-cms
+#
+# On VPS, generate the deploy key:
+#   ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_actions_deploy -N ""
+#   cat ~/.ssh/github_actions_deploy.pub >> ~/.ssh/authorized_keys
+#   cat ~/.ssh/github_actions_deploy   # copy this → GitHub secret VPS_SSH_KEY
+
 name: Deploy Payload CMS
 
 on:
