@@ -10,6 +10,7 @@ interface Props {
 }
 
 export const revalidate = 300;
+export const dynamic = "force-static";
 
 async function loadPost(slug: string) {
   const all = await getPosts().catch(() => staticPosts);

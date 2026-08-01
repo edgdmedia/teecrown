@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { triggerRevalidation } from '../hooks/triggerRevalidation'
 
 export const TourPackages: CollectionConfig = {
   slug: 'tour-packages',
@@ -76,4 +77,7 @@ export const TourPackages: CollectionConfig = {
       ],
     },
   ],
+  hooks: {
+    afterChange: [triggerRevalidation],
+  },
 }

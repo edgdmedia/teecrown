@@ -8,6 +8,7 @@ interface Props {
 }
 
 export const revalidate = 300;
+export const dynamic = "force-static";
 
 export async function generateStaticParams() {
   const packages = await getTourPackages().catch(() => staticPackages);

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { triggerRevalidation } from '../hooks/triggerRevalidation'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -27,4 +28,7 @@ export const Posts: CollectionConfig = {
       type: 'richText',
     },
   ],
+  hooks: {
+    afterChange: [triggerRevalidation],
+  },
 }

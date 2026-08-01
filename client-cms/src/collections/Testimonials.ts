@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { triggerRevalidation } from '../hooks/triggerRevalidation'
 
 export const Testimonials: CollectionConfig = {
   slug: 'testimonials',
@@ -15,4 +16,7 @@ export const Testimonials: CollectionConfig = {
     { name: 'text', type: 'textarea', required: true },
     { name: 'rating', type: 'number', min: 1, max: 5, defaultValue: 5, required: true },
   ],
+  hooks: {
+    afterChange: [triggerRevalidation],
+  },
 }
