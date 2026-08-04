@@ -3,20 +3,18 @@ import { sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   ALTER TABLE "pages" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "services_details" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "services" DISABLE ROW LEVEL SECURITY;
-  DROP TABLE "pages" CASCADE;
-  DROP TABLE "services_details" CASCADE;
-  DROP TABLE "services" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_pages_fk";
-  
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_services_fk";
-  
-  DROP INDEX "payload_locked_documents_rels_pages_id_idx";
-  DROP INDEX "payload_locked_documents_rels_services_id_idx";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "pages_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "services_id";`)
+   ALTER TABLE IF EXISTS "pages" DISABLE ROW LEVEL SECURITY;
+  ALTER TABLE IF EXISTS "services_details" DISABLE ROW LEVEL SECURITY;
+  ALTER TABLE IF EXISTS "services" DISABLE ROW LEVEL SECURITY;
+  ALTER TABLE IF EXISTS "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_pages_fk";
+  ALTER TABLE IF EXISTS "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_services_fk";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_pages_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_services_id_idx";
+  ALTER TABLE IF EXISTS "payload_locked_documents_rels" DROP COLUMN IF EXISTS "pages_id";
+  ALTER TABLE IF EXISTS "payload_locked_documents_rels" DROP COLUMN IF EXISTS "services_id";
+  DROP TABLE IF EXISTS "pages" CASCADE;
+  DROP TABLE IF EXISTS "services_details" CASCADE;
+  DROP TABLE IF EXISTS "services" CASCADE;`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
