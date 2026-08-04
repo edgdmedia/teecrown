@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { packages } from "@/data/packages";
+import type { Package } from "@/data/packages";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Heading } from "@/components/ui/heading";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +37,7 @@ function CarArrow({ dir, onClick, disabled }: { dir: 'prev' | 'next'; onClick: (
   );
 }
 
-export function ToursSection() {
+export function ToursSection({ packages }: { packages: Package[] }) {
   const d = packages;
   const c = useCarousel(d.length);
   const step = 100 / c.perView;

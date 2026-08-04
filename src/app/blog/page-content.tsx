@@ -1,0 +1,71 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { PageShell } from "@/components/layout/page-shell";
+import type { BlogPost } from "@/data/blog";
+import { Section } from "@/components/layout/section";
+import { PageHero } from "@/components/layout/page-hero";
+import { Reveal } from "@/components/motion/reveal";
+import { Badge } from "@/components/ui/badge";
+import { BlogCard } from "@/components/cards/blog-card";
+import { CtaBand } from "@/components/layout/cta-band";
+
+export function BlogPageContent({ posts }: { posts: BlogPost[] }) {
+  const [cat, setCat] = useState('All');
+  const feat = posts[0];
+  const rest = posts.slice(1);
+  const cats = ['All', ...Array.from(new Set(rest.map((p) => p.category)))];
+  const shown = cat === 'All' ? rest : rest.filter((p) => p.category === cat);
+
+  return (
+    <PageShell current="Blog">
+      {({ openContact }) => (
+        <>
+          <PageHero eyebrow="Stories, tips & guides" title="From the Tee'Crown journal" lede="Travel guides, cultural notes and stories from the road — written to help you travel smarter and deeper." image="/images/tour-turkey.webp" />
+          <Section>
+            <Reveal>
+              <Link href={`/blog/${feat.slug}`} className="tcc-featpost" style={{ boxShadow: 'var(--shadow-card)', textDecoration: 'none', background: '#fff' }}>
+                <div className="tcc-responsive-img-sm" style={{ overflow: 'hidden', height: '320px' }}>
+                  <img src={feat.image} alt={feat.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                </div>
+                <div style={{ padding: '44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ marginBottom: '14px' }}><Badge tone="accent">Featured · {feat.category}</Badge></div>
+                  <h2 style={{ fontFamily: 'var(--font-primary)', color: 'var(--color-heading)', fontWeight: 700, fontSize: 'clamp(24px,2.6vw,32px)', lineHeight: 1.25, margin: '0 0 14px' }}>{feat.title}</h2>
+                  <p style={{ color: 'var(--color-text)', fontSize: '16px', lineHeight: 1.7, margin: '0 0 20px' }}>{feat.excerpt}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                    <span style={{ color: 'var(--color-text-light)', fontSize: '14px' }}>{feat.date}</span>
+                    <span style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: '15px' }}>Read more →</span>
+                  </div>
+                </div>
+              </Link>
+            </Reveal>
+          </Section>
+          <Section tint="alt">
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-lg)' }}>
+              {cats.map((t) => {
+                const active = t === cat;
+                return (
+                  <button key={t} onClick={() => setCat(t)} style={{
+                    fontFamily: 'var(--font-secondary)', fontSize: '13px', fontWeight: 600, letterSpacing: '0.4px',
+                    padding: '9px 20px', borderRadius: '999px', cursor: 'pointer', transition: 'all .25s ease',
+                    border: `1.5px solid ${active ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                    background: active ? 'var(--color-primary)' : '#fff', color: active ? '#fff' : 'var(--color-text-strong)',
+                  }}>{t}</button>
+                );
+              })}
+            </div>
+            <div className="tcc-grid-3">
+              {shown.map((b, n) => (
+                <Reveal key={b.slug} delay={(n % 3) * 80} style={{ height: '100%' }}>
+                  <BlogCard image={b.image} category={b.category} title={b.title} excerpt={b.excerpt} date={b.date} readMoreLabel="Read more" href={`/blog/${b.slug}`} />
+                </Reveal>
+              ))}
+            </div>
+          </Section>
+          <CtaBand onContact={openContact} title="Inspired to travel?" text="Turn a story into your own journey. Our team is ready to help you plan it." cta="Book Now" />
+        </>
+      )}
+    </PageShell>
+  );
+}

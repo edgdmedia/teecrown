@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
-import { blogPosts } from "@/data/blog";
+import { blogPosts as staticPosts } from "@/data/blog";
+import { getPosts } from "@/lib/cms";
 import { BlogDetailContent } from "./page-content";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,24 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const revalidate = 300;
+export const dynamic = "force-static";
+
+async function loadPost(slug: string) {
+  const all = await getPosts().catch(() => staticPosts);
+  const p = all.find((b) => b.slug === slug) || staticPosts.find((b) => b.slug === slug);
+  const related = all.filter((x) => x.slug !== slug).slice(0, 3);
+  return { post: p, related, all };
+}
+
+export async function generateStaticParams() {
+  const posts = await getPosts().catch(() => staticPosts);
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const post = blogPosts.find((b) => b.slug === slug);
+  const { post } = await loadPost(slug);
   if (!post) return { title: "Post Not Found" };
 
   return {
@@ -35,8 +50,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params;
-  const post = blogPosts.find((b) => b.slug === slug);
-  const related = blogPosts.filter((x) => x.slug !== slug).slice(0, 3);
+  const { post, related } = await loadPost(slug);
 
   if (!post) {
     return (

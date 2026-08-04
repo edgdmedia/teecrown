@@ -2,6 +2,8 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": ".open-next/worker.js",
 	"name": "teecrownconsult",
+	"workers_dev": false,
+	"preview_urls": false,
 	"compatibility_date": "2026-07-29",
 	"compatibility_flags": [
 		"nodejs_compat",
@@ -17,6 +19,14 @@
 			// see https://opennext.js.org/cloudflare/caching
 			"binding": "WORKER_SELF_REFERENCE",
 			"service": "teecrownconsult"
+		}
+	],
+	"r2_buckets": [
+		{
+			// Use R2 incremental cache
+			// See https://opennext.js.org/cloudflare/caching
+			"binding": "NEXT_INC_CACHE_R2_BUCKET",
+			"bucket_name": "teecrownconsult-opennext-cache"
 		}
 	],
 	"images": {

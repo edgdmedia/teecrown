@@ -8,8 +8,16 @@ export interface ItineraryDay {
   description: string;
 }
 
+function para(text: string) {
+  return { type: 'paragraph' as const, children: [{ type: 'text' as const, text, format: 0, detail: 0, mode: 'normal' as const, style: '', version: 1 }], direction: 'ltr' as const, format: '', indent: 0, version: 1 };
+}
+
+function toLex(paragraphs: string[]) {
+  return { root: { type: 'root' as const, children: paragraphs.map(para), direction: 'ltr' as const, format: '', indent: 0, version: 1 } };
+}
+
 export interface PackageContent {
-  intro: string[];
+  intro: { root: { children: unknown[] } } | null;
   included?: string[];
   highlights?: string[];
   pricing?: PricingRow[];
@@ -39,11 +47,11 @@ export const packages: Package[] = [
     excerpt: 'History and modern life woven together — visa guidance, flights and full consultation for Nigerian travellers.',
     tag: 'Popular',
     content: {
-      intro: [
+      intro: toLex([
         "There is something unforgettable about Turkey. Maybe it is the blend of history and modern life. Maybe it is the breathtaking architecture of Istanbul, the magical landscapes of Cappadocia, or the warmth of a culture that welcomes visitors from around the world.",
         "At Tee'Crown Consult Ltd, we understand that international travel begins long before you board a flight. It starts with proper guidance, reliable information, and a smooth visa process. That is why our team is committed to assisting individuals and families in Nigeria who are planning trips to Turkey.",
-        "Whether you are planning a holiday, business trip, family visit, or simply looking to explore one of the world's most talked-about destinations, our team is available to guide you through the process professionally and responsibly.",
-      ],
+        "Whether you are planning a holiday, business trip, family visit, or simply looking to explore one of the world's most-talked-about destinations, our team is available to guide you through the process professionally and responsibly.",
+      ]),
       included: [
         'Turkey visa application guidance',
         'Travel consultation',
@@ -65,11 +73,11 @@ export const packages: Package[] = [
     excerpt: 'Breathtaking savannahs, giraffes up close and pristine beaches. Fast Kenya eTA processing in 48–72 hours.',
     tag: 'Safari',
     content: {
-      intro: [
+      intro: toLex([
         "Dreaming of an unforgettable getaway to Kenya? Whether it is exploring breathtaking savannahs, feeding giraffes up close, or relaxing on pristine beaches, Tee'Crown Consult Ltd has got you covered!",
         "Why Choose Kenya? Witness the Great Migration and Big Five safari. Explore white sandy beaches and turquoise waters. Experience vibrant culture, rich history and adventure.",
         "Don't let borders hold you back — your Kenyan adventure begins here!",
-      ],
+      ]),
       pricing: [
         { label: 'eTA Processing', value: '48–72 hours' },
         { label: 'Visa Validity', value: '90 days' },
@@ -100,10 +108,10 @@ export const packages: Package[] = [
     excerpt: 'Gardens by the Bay, Universal Studios and skyline views — visa assistance and vacation planning included.',
     tag: 'City',
     content: {
-      intro: [
+      intro: toLex([
         "Tee'Crown Consult Ltd currently provides travel support services for individuals and families interested in visiting Singapore for tourism, business, or vacation purposes.",
         "Singapore remains one of the most visited destinations for travellers looking to experience modern city attractions, cultural sites, shopping, and family-friendly locations such as Marina Bay Sands, Gardens by the Bay, Sentosa Island, and Universal Studios Singapore.",
-      ],
+      ]),
       pricing: [
         { label: 'Package Price', value: '₦2,764,589 for 2 pax' },
         { label: 'Accommodation', value: '4 nights' },
@@ -143,11 +151,11 @@ export const packages: Package[] = [
     excerpt: 'Premium Lagos boat cruises for romantic escapes, celebrations and corporate retreats — crew, décor and catering.',
     tag: 'Local',
     content: {
-      intro: [
+      intro: toLex([
         "Discover Lagos from a new perspective — calm waters, stunning skyline views, and an atmosphere designed for unforgettable moments.",
         "Tee'Crown Consult Limited delivers premium boat cruise experiences perfect for romantic escapes, birthdays, anniversaries, group celebrations, corporate retreats, and executive gatherings. With a luxury vessel, professional crew, full safety compliance, and optional décor, music, and catering add-ons, every detail is carefully curated for comfort, class, and enjoyment.",
         "This isn't just a cruise. It's a Tee'Crown experience. Limited prime slots available.",
-      ],
+      ]),
       included: [
         'Private boat charter',
         'Life jackets & safety briefing',
@@ -169,10 +177,10 @@ export const packages: Package[] = [
     excerpt: 'For couples celebrating their love — airfare, boutique stays, sightseeing, fine dining and spa treatments.',
     tag: 'Romance',
     content: {
-      intro: [
+      intro: toLex([
         "This package is designed for couples looking to celebrate their love in a truly special way. We take time to understand you as a couple and craft a romantic getaway around it.",
         "Think handpicked resorts, candlelit dinners and thoughtful surprises along the way — every detail arranged so you can simply be together.",
-      ],
+      ]),
       included: [
         'Return airfare',
         'Boutique accommodation',
@@ -194,10 +202,10 @@ export const packages: Package[] = [
     excerpt: 'Travel to a holy site with everything handled — airfare, accommodation and transport to and from the site.',
     tag: 'Faith',
     content: {
-      intro: [
+      intro: toLex([
         "For travellers journeying to a holy site for religious purposes, we take care of the logistics so you can focus on the spiritual experience.",
         "From documentation to accommodation near the site, our team ensures a smooth, dignified and well-supported pilgrimage.",
-      ],
+      ]),
       included: [
         'Return airfare',
         'Accommodation',
@@ -219,10 +227,10 @@ export const packages: Package[] = [
     excerpt: 'Access affordable, world-class medical procedures abroad — with full travel, accommodation and hospital coordination.',
     tag: 'Wellness',
     content: {
-      intro: [
+      intro: toLex([
         "Medical tourism opens the door to high-quality healthcare at a fraction of the cost. We connect you with accredited hospitals and specialists overseas, handling every step of the journey.",
         "From initial consultation to post-procedure recovery, our team ensures a seamless blend of medical care and comfortable travel — so you can focus on healing.",
-      ],
+      ]),
       included: [
         'Medical visa assistance',
         'Return flights from Nigeria',
@@ -244,10 +252,10 @@ export const packages: Package[] = [
     excerpt: 'No fixed plans — tell us your dream destination, and we will build a completely personalised trip around you.',
     tag: 'Bespoke',
     content: {
-      intro: [
+      intro: toLex([
         "Not every trip fits a pre-made package — and that is exactly the point. A custom itinerary is for travellers who know what they want or simply want to explore what is possible.",
         "Tell us your destination, dates, group size and interests, and we will build a trip from scratch: flights, visas, accommodation, activities and ground support — designed around you.",
-      ],
+      ]),
       included: [
         'Visa guidance & processing',
         'Return flights & internal transfers',
@@ -269,10 +277,10 @@ export const packages: Package[] = [
     excerpt: "Ready-to-book holiday getaways to the world's most beloved destinations — flights, hotels and tours included.",
     tag: 'Leisure',
     content: {
-      intro: [
+      intro: toLex([
         "Sometimes you just need a holiday — the kind where every detail is taken care of before you even pack your bags. Our vacation packages are curated getaways to top destinations worldwide.",
         "From the beaches of the Maldives to the streets of Paris, we include flights, accommodation, daily itinerary and on-ground support so all you have to worry about is enjoying yourself.",
-      ],
+      ]),
       included: [
         'Return airfare',
         'Hotel accommodation with breakfast',

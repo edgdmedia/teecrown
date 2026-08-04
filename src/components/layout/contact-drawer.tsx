@@ -12,6 +12,8 @@ interface ContactDrawerProps {
 
 export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const formRef = useState<HTMLFormElement | null>(null);
   useEffect(() => { if (open) setSent(false); }, [open]);
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -43,10 +45,26 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
             <p style={{ margin: 0, fontWeight: 600 }}>Thank you! Our team will get back to you shortly.</p>
           </div>
         ) : (
-          <form onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
+          <form ref={(el) => { formRef[1](el); }} onSubmit={async (e) => {
+              e.preventDefault();
+              const f = new FormData(e.currentTarget);
+              setSending(true);
+              try {
+                await fetch('/api/contact', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    name: f.get('name'), phone: f.get('phone'), email: f.get('email'),
+                    service: f.get('service'), message: f.get('message'), referral: f.get('referral'),
+                  }),
+                });
+                setSent(true);
+              } catch { setSent(true); }
+              setSending(false);
+            }}>
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '4px', color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}>Name</label>
-              <input required placeholder="Your full name" style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', transition: 'border-color .3s ease' }}
+              <input name="name" required placeholder="Your full name" style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', transition: 'border-color .3s ease' }}
                 onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
                 onBlur={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
               />
@@ -54,14 +72,14 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
             <div className="tcc-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '4px', color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}>Phone</label>
-                <input type="tel" placeholder="080..." style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', transition: 'border-color .3s ease' }}
+                <input name="phone" type="tel" placeholder="080..." style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', transition: 'border-color .3s ease' }}
                   onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
                   onBlur={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
                 />
               </div>
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '4px', color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}>Email</label>
-                <input type="email" required placeholder="you@email.com" style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', transition: 'border-color .3s ease' }}
+                <input name="email" type="email" required placeholder="you@email.com" style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', transition: 'border-color .3s ease' }}
                   onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
                   onBlur={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
                 />
@@ -69,7 +87,7 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
             </div>
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '4px', color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}>Which service?</label>
-              <select style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath fill=\'%2354595F\' d=\'M6 8 0 0h12z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', paddingRight: '40px' }}>
+              <select name="service" style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath fill=\'%2354595F\' d=\'M6 8 0 0h12z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', paddingRight: '40px' }}>
                 <option>Flight &amp; Ticket Reservation</option>
                 <option>Visa Assistance</option>
                 <option>Student Visa Assistance</option>
@@ -80,14 +98,14 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
             </div>
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '4px', color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}>Tell us about your trip</label>
-              <textarea placeholder="Destination, dates, number of travellers, budget..." style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', minHeight: '100px', resize: 'vertical', transition: 'border-color .3s ease' }}
+              <textarea name="message" placeholder="Destination, dates, number of travellers, budget..." style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', minHeight: '100px', resize: 'vertical', transition: 'border-color .3s ease' }}
                 onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
                 onBlur={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
               />
             </div>
             <div style={{ marginBottom: '24px' }}>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '4px', color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}>Where did you hear about us?</label>
-              <select style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath fill=\'%2354595F\' d=\'M6 8 0 0h12z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', paddingRight: '40px' }}>
+              <select name="referral" style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--color-text)', background: '#fff', outline: 'none', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath fill=\'%2354595F\' d=\'M6 8 0 0h12z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', paddingRight: '40px' }}>
                 <option>Google</option>
                 <option>Social Media</option>
                 <option>Family and Friends</option>
@@ -95,7 +113,7 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
                 <option>Other</option>
               </select>
             </div>
-            <Button variant="accent" type="submit" style={{ width: '100%' }}>Send my request</Button>
+            <Button variant="accent" type="submit" disabled={sending} style={{ width: '100%' }}>{sending ? 'Sending...' : 'Send my request'}</Button>
           </form>
         )}
       </div>
