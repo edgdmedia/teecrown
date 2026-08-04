@@ -1,0 +1,13 @@
+{
+  "slug": "luxury-water",
+  "title": "Luxury on the Water",
+  "location": "Lagos Lagoon",
+  "image": "/images/tour-luxury-water.webp",
+  "duration": "Half or full day",
+  "gallery": ["/images/tour-luxury-water.webp", "/images/water1.webp", "/images/hero-beach.webp"],
+  "excerpt": "Premium Lagos boat cruises for romantic escapes, celebrations and corporate retreats — crew, décor and catering.",
+  "tag": "Local",
+  "intro": "Discover Lagos from a new perspective — calm waters, stunning skyline views, and an atmosphere designed for unforgettable moments.\n\nTee'Crown Consult Limited delivers premium boat cruise experiences perfect for romantic escapes, birthdays, anniversaries, group celebrations, corporate retreats, and executive gatherings. With a luxury vessel, professional crew, full safety compliance, and optional décor, music, and catering add-ons, every detail is carefully curated for comfort, class, and enjoyment.\n\nThis isn't just a cruise. It's a Tee'Crown experience. Limited prime slots available.",
+  "included": ["Private boat charter", "Life jackets & safety briefing", "Refreshments on board", "Custom décor & catering (add-on)"],
+  "highlights": ["Private skyline cruise on Lagos Lagoon", "Sunset and celebration packages", "Professional captain & crew", "Optional décor, catering & DJ"]
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "custom",
+  "title": "Custom Itinerary",
+  "location": "Anywhere you choose",
+  "image": "/images/tour-custom.webp",
+  "duration": "Tailored",
+  "gallery": ["/images/tour-custom.webp", "/images/hero-travel-1.webp", "/images/hero-dubai.webp"],
+  "excerpt": "No fixed plans — tell us your dream destination, and we will build a completely personalised trip around you.",
+  "tag": "Bespoke",
+  "intro": "Not every trip fits a pre-made package — and that is exactly the point. A custom itinerary is for travellers who know what they want or simply want to explore what is possible.\n\nTell us your destination, dates, group size and interests, and we will build a trip from scratch: flights, visas, accommodation, activities and ground support — designed around you.",
+  "included": ["Visa guidance & processing", "Return flights & internal transfers", "Hand-picked accommodation", "24/7 in-country support"],
+  "highlights": ["Entirely personalised itinerary", "Choice of destination, season & duration", "Curated experiences matching your interests", "Dedicated trip coordinator from start to finish"]
+}

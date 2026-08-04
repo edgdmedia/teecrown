@@ -1,0 +1,30 @@
+{
+  "name": "teecrownconsult-admin",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "build:cloudflare": "opennextjs-cloudflare build",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@keystatic/core": "^0.6.4",
+    "@keystatic/next": "^5.0.4",
+    "@opennextjs/cloudflare": "^1.20.2",
+    "next": "16.2.12",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.12",
+    "typescript": "^5",
+    "wrangler": "^4.115.0"
+  }
+}
