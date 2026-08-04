@@ -10,12 +10,15 @@ First visit auto-pushes schema to Postgres. Create admin user at `/admin`.
 ## Deploy
 
 ```bash
-docker compose up -d --build
+git pull origin main
+npm install
+PAYLOAD_ENABLE_SMTP=false npm run build
+pm2 restart teecrown-cms
 ```
 
 ## VPS Setup (Webmin + Caddy)
 
-This server runs Webmin. The CMS runs in Docker behind Caddy.
+This server runs Webmin. The CMS runs on the host via PM2 behind Caddy.
 
 ### DNS (Cloudflare)
 

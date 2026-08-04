@@ -27,8 +27,8 @@ Visitor traffic never touches the VPS — pages are served from Cloudflare's edg
 
 ```bash
 node -v          # confirm 20.9+
-docker --version
-docker compose version
+pm2 -v
+psql --version
 ```
 
 If missing:
@@ -96,9 +96,9 @@ db: postgresAdapter({
 
 1. Change the collection field(s) locally — dev-mode push handles your local DB as normal.
 2. When ready to ship: `npx payload migrate:create` — diffs your schema and writes a migration file into `./src/migrations`, which gets **committed to the repo** (never run locally against production).
-3. Deploy as normal (Part 4). The deploy step runs `payload migrate`, applying any pending migration files against the production database.
+3. Deploy as normal (Part 4). In this project, run migrations manually until the migration runner hang is fully resolved.
 
-`payload migrate` is safe to run on **every single deploy**, whether or not anything changed — if there's nothing pending, it detects that and exits without doing anything. That's why it's fine to bake it unconditionally into the deploy script rather than trying to detect "is there a migration this time" yourself — see Part 4.3 below.
+Do not assume migrations are safe to run inside every deploy on this project today. The production server runs native Postgres + PM2, and the migration runner has previously hung during startup. Treat migrations as a separate operational step until that issue is fully closed out.
 
 ### 1.5 Environment variables
 
@@ -130,8 +130,7 @@ export default buildConfig({
 Never test directly against production. Local loop first:
 
 ```bash
-# Start just the Postgres service locally (reuse the same docker-compose.yml)
-docker compose up -d db
+# Start local Postgres however you prefer (Homebrew, app service, container, etc.)
 
 # Local .env (separate from production .env — don't reuse the same file)
 DATABASE_URI=postgresql://client_cms_user:CHANGE_ME@localhost:5432/client_cms
@@ -145,71 +144,23 @@ npm run dev
 
 This gives you the admin panel and API at `localhost:3000/admin` and `localhost:3000/api` — create a test entry, confirm it saves.
 
-Then run the **frontend** locally too, pointed at this local Payload instance (`NEXT_PUBLIC_PAYLOAD_URL=http://localhost:3000`), and confirm the full loop: edit content locally → frontend reflects it. Only once this round-trip works locally should you build the Docker image and deploy to the VPS (Part 1.6 onward).
+Then run the **frontend** locally too, pointed at this local Payload instance (`NEXT_PUBLIC_PAYLOAD_URL=http://localhost:3000`), and confirm the full loop: edit content locally → frontend reflects it.
 
-### 1.6 Dockerize
+### 1.6 VPS runtime
 
-`next.config.mjs`:
-```javascript
-import { withPayload } from '@payloadcms/next/withPayload'
-export default withPayload({ output: 'standalone' })
-```
+This project does **not** use Docker on the production VPS. The server runs:
 
-`Dockerfile`:
-```dockerfile
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-ENV NODE_ENV=production
-RUN npm run build
+- native Postgres 16 via `systemd`
+- the CMS via `pm2`
+- a standalone Next.js build from `.next/standalone/server.js`
 
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 payload
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-RUN mkdir -p /app/public/media && chown -R payload:nodejs /app/public/media
-USER payload
-EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
-```
-
-`docker-compose.yml` (omit the `db` service if reusing an existing Postgres instance on the box):
-```yaml
-services:
-  db:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: client_cms
-      POSTGRES_USER: client_cms_user
-      POSTGRES_PASSWORD: CHANGE_ME
-    volumes:
-      - client_cms_pgdata:/var/lib/postgresql/data
-
-  payload:
-    build: .
-    restart: unless-stopped
-    env_file: .env
-    ports:
-      - "127.0.0.1:3000:3000"
-    volumes:
-      - ./media:/app/public/media
-    depends_on:
-      - db
-
-volumes:
-  client_cms_pgdata:
-```
+The production deploy sequence is:
 
 ```bash
-docker compose up -d --build
+git pull origin main
+npm install
+PAYLOAD_ENABLE_SMTP=false npm run build
+pm2 restart teecrown-cms
 ```
 
 ### 1.7 Reverse proxy + SSL (Caddy)

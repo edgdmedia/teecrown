@@ -57,15 +57,14 @@ jobs:
             echo ">> Installing dependencies"
             npm install --no-audit --no-fund
 
-            echo ">> Applying database migrations"
-            npm run migrate
+            echo ">> Skipping migrations temporarily"
 
             echo ">> Building standalone bundle"
-            npm run build
+            PAYLOAD_ENABLE_SMTP=false npm run build
 
             echo ">> Restarting PM2 process"
             pm2 delete teecrown-cms || true
-            pm2 start .next/standalone/server.js --name teecrown-cms
+            PAYLOAD_ENABLE_SMTP=false pm2 start .next/standalone/server.js --name teecrown-cms
             pm2 save
 
             echo ">> Final status"
