@@ -1,0 +1,17 @@
+{
+  "slug": "singapore",
+  "title": "A Trip to Singapore",
+  "location": "Marina Bay · Sentosa",
+  "image": "/images/tour-singapore.webp",
+  "duration": "5 days / 4 nights",
+  "gallery": ["/images/tour-singapore.webp", "/images/singapore2.webp", "/images/hero-dubai.webp"],
+  "excerpt": "Gardens by the Bay, Universal Studios and skyline views — visa assistance and vacation planning included.",
+  "tag": "City",
+  "intro": "Tee'Crown Consult Ltd currently provides travel support services for individuals and families interested in visiting Singapore for tourism, business, or vacation purposes.\n\nSingapore remains one of the most visited destinations for travellers looking to experience modern city attractions, cultural sites, shopping, and family-friendly locations such as Marina Bay Sands, Gardens by the Bay, Sentosa Island, and Universal Studios Singapore.",
+  "pricing": [{ "label": "Package Price", "value": "₦2,764,589 for 2 pax" }, { "label": "Accommodation", "value": "4 nights" }, { "label": "Meals", "value": "Daily breakfast" }, { "label": "Visa", "value": "Singapore e-visa" }, { "label": "Sightseeing", "value": "SIC (Seat-in-Coach)" }, { "label": "Transfers", "value": "Private Transfers" }],
+  "validUntil": "August 31, 2026",
+  "included": ["Singapore visa assistance", "Flight booking support", "Hotel reservation guidance", "Travel consultation", "Vacation planning"],
+  "highlights": ["Gardens by the Bay & Supertree light show", "Marina Bay Sands SkyPark", "Universal Studios on Sentosa Island", "Night Safari experience"],
+  "itinerary": [{ "day": "Day 1", "description": "Arrival + Night Safari" }, { "day": "Day 2", "description": "City Tour + Sentosa Island" }, { "day": "Day 3", "description": "Gardens by the Bay + Shopping" }, { "day": "Day 4", "description": "Free Day" }, { "day": "Day 5", "description": "Departure" }],
+  "hashtags": ["#SingaporeTravel", "#VisaAssistance", "#TravelConsultant", "#InternationalTravel"]
+}

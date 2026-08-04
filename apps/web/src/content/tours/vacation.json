@@ -1,0 +1,13 @@
+{
+  "slug": "vacation",
+  "title": "Vacation Packages",
+  "location": "Top destinations worldwide",
+  "image": "/images/tour-vacation.webp",
+  "duration": "5–14 days",
+  "gallery": ["/images/tour-vacation.webp", "/images/hero-beach.webp", "/images/hero-travel-3.webp"],
+  "excerpt": "Ready-to-book holiday getaways to the world's most beloved destinations — flights, hotels and tours included.",
+  "tag": "Leisure",
+  "intro": "Sometimes you just need a holiday — the kind where every detail is taken care of before you even pack your bags. Our vacation packages are curated getaways to top destinations worldwide.\n\nFrom the beaches of the Maldives to the streets of Paris, we include flights, accommodation, daily itinerary and on-ground support so all you have to worry about is enjoying yourself.",
+  "included": ["Return airfare", "Hotel accommodation with breakfast", "Daily itinerary & tour suggestions", "Airport transfers & travel insurance"],
+  "highlights": ["Curated destinations across continents", "Hassle-free booking with everything included", "Family-friendly and couples options", "Flexible add-ons for excursions & dining"]
+}

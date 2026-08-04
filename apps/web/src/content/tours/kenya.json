@@ -1,0 +1,15 @@
+{
+  "slug": "kenya",
+  "title": "The Magic of Kenya",
+  "location": "Nairobi · Maasai Mara · Diani",
+  "image": "/images/kenya1.webp",
+  "duration": "6–8 days",
+  "gallery": ["/images/kenya1.webp", "/images/kenya2.webp", "/images/kenya3.webp"],
+  "excerpt": "Breathtaking savannahs, giraffes up close and pristine beaches. Fast Kenya eTA processing in 48–72 hours.",
+  "tag": "Safari",
+  "intro": "Dreaming of an unforgettable getaway to Kenya? Whether it is exploring breathtaking savannahs, feeding giraffes up close, or relaxing on pristine beaches, Tee'Crown Consult Ltd has got you covered!\n\nWhy Choose Kenya? Witness the Great Migration and Big Five safari. Explore white sandy beaches and turquoise waters. Experience vibrant culture, rich history and adventure.\n\nDon't let borders hold you back — your Kenyan adventure begins here!",
+  "pricing": [{ "label": "eTA Processing", "value": "48–72 hours" }, { "label": "Visa Validity", "value": "90 days" }],
+  "included": ["Kenya eTA processing (48–72 hrs)", "Return flights & internal transfers", "Safari lodge accommodation", "Park fees & guided game drives"],
+  "highlights": ["Big-Five game drives in the Maasai Mara", "Giraffe Centre & elephant orphanage in Nairobi", "White-sand beaches at Diani", "Authentic Maasai cultural experiences"],
+  "requirements": ["International Passport", "Passport Photograph", "Other necessary documents"]
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "pilgrimage",
+  "title": "Pilgrimage",
+  "location": "Holy sites worldwide",
+  "image": "/images/pilgrimage1.webp",
+  "duration": "Varies",
+  "gallery": ["/images/pilgrimage1.webp", "/images/pilgrimage2.webp", "/images/pilgrimage3.webp"],
+  "excerpt": "Travel to a holy site with everything handled — airfare, accommodation and transport to and from the site.",
+  "tag": "Faith",
+  "intro": "For travellers journeying to a holy site for religious purposes, we take care of the logistics so you can focus on the spiritual experience.\n\nFrom documentation to accommodation near the site, our team ensures a smooth, dignified and well-supported pilgrimage.",
+  "included": ["Return airfare", "Accommodation", "Transport to and from the site", "Dedicated coordinator"],
+  "highlights": ["Guidance on pilgrimage documentation", "Accommodation close to the holy site", "Group and individual arrangements", "On-ground transport & support"]
+}

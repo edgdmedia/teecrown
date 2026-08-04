@@ -4,6 +4,11 @@ Travel and tourism website for Tee'Crown Consult Limited — a Nigerian travel a
 
 Built with [Next.js](https://nextjs.org) (App Router) and deployed on [Cloudflare Workers](https://workers.cloudflare.com) via `@opennextjs/cloudflare`.
 
+The repo now has two Cloudflare apps:
+
+- `teecrownconsult.org` - public website
+- `dash.teecrownconsult.org` - Keystatic admin studio in GitHub mode
+
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router)
@@ -14,90 +19,139 @@ Built with [Next.js](https://nextjs.org) (App Router) and deployed on [Cloudflar
 ## Project Structure
 
 ```
-src/
-├── app/              # Next.js App Router pages
-│   ├── about/
-│   ├── blog/
-│   ├── services/
-│   └── tours/
-├── components/
-│   ├── cards/        # Reusable card components
-│   ├── layout/       # Shell, nav, footer, containers
-│   ├── motion/       # Animation wrappers
-│   ├── sections/     # Homepage section components
-│   └── ui/           # Primitives (buttons, badges, icons, lightbox)
-├── data/             # Content data (packages, services, blog posts, etc.)
-└── lib/              # Shared context and utilities
+apps/
+├── admin/            # Keystatic admin app for dash.teecrownconsult.org
+└── web/              # Public website for teecrownconsult.org
 ```
 
 ## Getting Started
 
 ```bash
 npm install
-npm run dev
+npm run dev --workspace apps/web
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-## Adding a Tour Package
+## Content Editing
 
-Tour packages are defined in `src/data/packages.ts`. Each package uses a flexible content structure:
+The public site now reads its editable content from `apps/web/src/content/**` at build time.
 
-```typescript
-{
-  slug: 'my-package',
-  title: 'My Package',
-  location: 'City · Region',
-  image: '/images/tour-my-package.webp',
-  duration: '5 days',
-  gallery: ['/images/tour-my-package.webp', '/images/gallery-2.webp'],
-  excerpt: 'Short description',
-  tag: 'Tag',
-  content: {
-    intro: ['Paragraph one.', 'Paragraph two.'],
-    highlights: ['Highlight 1', 'Highlight 2'],
-    included: ['Service 1', 'Service 2'],
-    pricing: [{ label: 'Price', value: '₦1,000,000' }],
-    itinerary: [{ day: 'Day 1', description: 'Arrival' }],
-    requirements: ['Passport', 'Photo'],
-    hashtags: ['#Tag1', '#Tag2'],
-    validUntil: 'December 31, 2026',
-  },
-}
-```
+Keystatic manages that content through the admin app in `apps/admin`.
 
-All sections except `intro` are optional — only render what the package needs.
-
-## Deploying to Cloudflare
-
-### Prerequisites
+### Local public site
 
 ```bash
-npx wrangler login
-npx wrangler whoami
+npm run dev --workspace apps/web
 ```
 
-### Build & Deploy
+### Local admin studio
 
 ```bash
-npm run build:cloudflare   # Build for Cloudflare Workers
-npm run deploy             # Build + deploy
+npm install --prefix apps/admin
+npm run dev --prefix apps/admin
 ```
 
-### Local Preview
+### Required admin env vars
+
+Keystatic GitHub mode requires these for the deployed admin app:
+
+- `KEYSTATIC_GITHUB_CLIENT_ID`
+- `KEYSTATIC_GITHUB_CLIENT_SECRET`
+- `KEYSTATIC_SECRET`
+
+GitHub OAuth app settings:
+
+- Homepage URL: `https://dash.teecrownconsult.org`
+- Authorization callback URL: `https://dash.teecrownconsult.org/api/keystatic/github/oauth/callback`
+
+Generate `KEYSTATIC_SECRET` locally with:
 
 ```bash
-npm run preview
+openssl rand -base64 32
 ```
 
-### Manual Deploy
+### Where to set admin secrets
+
+For the deployed admin Worker, set these in Cloudflare:
 
 ```bash
+cd apps/admin
+npx wrangler secret put KEYSTATIC_GITHUB_CLIENT_ID
+npx wrangler secret put KEYSTATIC_GITHUB_CLIENT_SECRET
+npx wrangler secret put KEYSTATIC_SECRET
+```
+
+Paste the matching values when prompted.
+
+## Content Source
+
+Public editable content now lives under `apps/web/src/content/`:
+
+- `apps/web/src/content/site.json`
+- `apps/web/src/content/contact.json`
+- `apps/web/src/content/blog/*.json`
+- `apps/web/src/content/tours/*.json`
+- `apps/web/src/content/testimonials/*.json`
+
+The public site reads those files directly during build.
+
+Some marketing/support data is still static TypeScript for now:
+
+- `apps/web/src/data/services.ts`
+- `apps/web/src/data/reasons.ts`
+- `apps/web/src/data/stats.ts`
+- `apps/web/src/data/steps.ts`
+
+## Deploying To Cloudflare
+
+### Public site
+
+```bash
+cd apps/web
 npm run build:cloudflare
-npx wrangler deploy
+npm run deploy
 ```
 
-The worker runs at `https://teecrownconsult.<account-id>.workers.dev`. Add a custom domain in the Cloudflare Dashboard under Workers & Pages → your worker → Settings → Triggers → Custom Domains.
+### Admin studio
+
+```bash
+npm run build:cloudflare --prefix apps/admin
+npx wrangler deploy --config apps/admin/wrangler.jsonc
+```
+
+### GitHub Actions secrets for automated deploys
+
+Add these repository secrets before using `.github/workflows/deploy-site.yml` and `.github/workflows/deploy-admin.yml`:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `KEYSTATIC_GITHUB_CLIENT_ID`
+- `KEYSTATIC_GITHUB_CLIENT_SECRET`
+- `KEYSTATIC_SECRET`
+
+### GitHub Actions workflows
+
+- `.github/workflows/deploy-site.yml` deploys the public Worker named `teecrownconsult` from `apps/web`
+- `.github/workflows/deploy-admin.yml` deploys the admin Worker named `teecrownconsult-admin`
+
+On first successful run, `wrangler deploy` will create the Worker script if it does not already exist in the target Cloudflare account.
+
+### Cloudflare route
+
+After the admin Worker is deployed, add a custom domain in Cloudflare:
+
+- Worker: `teecrownconsult-admin`
+- Route/domain: `dash.teecrownconsult.org`
+
+### Architecture after deploy
+
+```text
+teecrownconsult.org      -> public frontend Worker
+dash.teecrownconsult.org -> Keystatic admin Worker
+GitHub repo              -> content source of truth
+Cloudflare R2            -> public site incremental cache
+```
 
 ## Image Guidelines
 

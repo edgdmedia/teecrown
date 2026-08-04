@@ -1,0 +1,13 @@
+{
+  "slug": "turkey",
+  "title": "Discover Turkey",
+  "location": "Istanbul · Cappadocia · Antalya",
+  "image": "/images/tour-turkey.webp",
+  "duration": "7–10 days",
+  "gallery": ["/images/tour-turkey.webp", "/images/turkey2.webp", "/images/turkey3.webp"],
+  "excerpt": "History and modern life woven together — visa guidance, flights and full consultation for Nigerian travellers.",
+  "tag": "Popular",
+  "intro": "There is something unforgettable about Turkey. Maybe it is the blend of history and modern life. Maybe it is the breathtaking architecture of Istanbul, the magical landscapes of Cappadocia, or the warmth of a culture that welcomes visitors from around the world.\n\nAt Tee'Crown Consult Ltd, we understand that international travel begins long before you board a flight. It starts with proper guidance, reliable information, and a smooth visa process. That is why our team is committed to assisting individuals and families in Nigeria who are planning trips to Turkey.\n\nWhether you are planning a holiday, business trip, family visit, or simply looking to explore one of the world's most-talked-about destinations, our team is available to guide you through the process professionally and responsibly.",
+  "included": ["Turkey visa application guidance", "Travel consultation", "Flight booking support", "General travel information and assistance"],
+  "highlights": ["Sunrise hot-air balloon over Cappadocia", "The Blue Mosque, Hagia Sophia & Grand Bazaar", "Bosphorus cruise between two continents", "Relaxing on the Antalya Riviera"]
+}

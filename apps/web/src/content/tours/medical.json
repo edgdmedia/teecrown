@@ -1,0 +1,13 @@
+{
+  "slug": "medical",
+  "title": "Medical Tourism",
+  "location": "World-class hospitals worldwide",
+  "image": "/images/medical1.webp",
+  "duration": "Tailored",
+  "gallery": ["/images/medical1.webp", "/images/medical2.webp", "/images/medical3.webp"],
+  "excerpt": "Access affordable, world-class medical procedures abroad — with full travel, accommodation and hospital coordination.",
+  "tag": "Wellness",
+  "intro": "Medical tourism opens the door to high-quality healthcare at a fraction of the cost. We connect you with accredited hospitals and specialists overseas, handling every step of the journey.\n\nFrom initial consultation to post-procedure recovery, our team ensures a seamless blend of medical care and comfortable travel — so you can focus on healing.",
+  "included": ["Medical visa assistance", "Return flights from Nigeria", "Hospital & accommodation booking", "In-country support & airport transfers"],
+  "highlights": ["Access to accredited international hospitals", "Cost-effective treatment packages", "Pre-trip consultation & medical records coordination", "Post-procedure recovery accommodation"]
+}

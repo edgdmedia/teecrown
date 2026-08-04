@@ -1,0 +1,13 @@
+{
+  "slug": "honeymoon",
+  "title": "Honeymoon Escapes",
+  "location": "Made for two",
+  "image": "/images/tour-honeymoon.webp",
+  "duration": "Tailored",
+  "gallery": ["/images/tour-honeymoon.webp", "/images/hero-beach.webp", "/images/tour-vacation.webp"],
+  "excerpt": "For couples celebrating their love — airfare, boutique stays, sightseeing, fine dining and spa treatments.",
+  "tag": "Romance",
+  "intro": "This package is designed for couples looking to celebrate their love in a truly special way. We take time to understand you as a couple and craft a romantic getaway around it.\n\nThink handpicked resorts, candlelit dinners and thoughtful surprises along the way — every detail arranged so you can simply be together.",
+  "included": ["Return airfare", "Boutique accommodation", "Sightseeing & dining", "Spa treatments"],
+  "highlights": ["Handpicked romantic resorts", "Candlelit dinners & couple spa days", "Private sightseeing & excursions", "Thoughtful in-trip surprises"]
+}
