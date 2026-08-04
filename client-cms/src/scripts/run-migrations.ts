@@ -23,7 +23,9 @@ async function main() {
   await payload.db.migrate({
     forceAcceptWarning: true,
   } as { forceAcceptWarning: true } & Parameters<typeof payload.db.migrate>[0])
-  await payload.destroy()
+
+  // Payload leaves open handles in this one-off CLI path, so exit explicitly.
+  void payload.destroy()
 }
 
 async function removeDevMigrationMarker(payload: Awaited<ReturnType<typeof getPayload>>) {
@@ -48,4 +50,11 @@ async function removeDevMigrationMarker(payload: Awaited<ReturnType<typeof getPa
     })
   }
 }
-void main()
+main()
+  .then(() => {
+    process.exit(0)
+  })
+  .catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
