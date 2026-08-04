@@ -1,19 +1,30 @@
-# Requires these GitHub repository secrets:
-#   VPS_HOST         — VPS IP or hostname
-#   VPS_USER         — SSH username
-#   VPS_SSH_KEY      — private SSH key (deploy key on VPS)
-#   VPS_PROJECT_PATH — absolute path to client-cms/ on VPS, e.g. /home/user/client-cms
+# Requires these GitHub repository secrets (Settings → Secrets and variables → Actions):
+#   VPS_HOST         — VPS IP or hostname, e.g. 169.58.2.239
+#   VPS_USER         — SSH username, e.g. teecrownconsult
+#   VPS_SSH_KEY      — private SSH key (deploy key on VPS); MUST be the full
+#                      PEM/OpenSSH private key including the header and footer lines
+#   VPS_PROJECT_PATH — repo root on VPS, e.g. /home/teecrownconsult/teecrown
+#   VPS_PORT         — (optional) SSH port, defaults to 22
+#   VPS_FINGERPRINT  — (optional) server host key fingerprint for extra security
 #
 # On VPS, generate the deploy key:
-#   ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_actions_deploy -N ""
+#   ssh-keygen -t ed25519 -C "teecrown-github-actions-deploy" -f ~/.ssh/github_actions_deploy -N ""
 #   cat ~/.ssh/github_actions_deploy.pub >> ~/.ssh/authorized_keys
-#   cat ~/.ssh/github_actions_deploy   # copy this → GitHub secret VPS_SSH_KEY
+#   cat ~/.ssh/github_actions_deploy   # copy this private key → GitHub secret VPS_SSH_KEY
+#
+# NOTE: the private key pasted into VPS_SSH_KEY must start with "-----BEGIN ... PRIVATE KEY-----".
+# A single-line raw base64 blob causes: ssh.ParsePrivateKey: ssh: no key found
 
 name: Deploy Payload CMS
 
 on:
   push:
-    branches: [main]
+    branches: [development, main]
+  workflow_dispatch:
+
+concurrency:
+  group: cms-deploy
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -25,9 +36,39 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || '22' }}
+          fingerprint: ${{ secrets.VPS_FINGERPRINT || '' }}
+          script_stop: true
+          timeout: 30s
+          command_timeout: 30m
+          envs: BRANCH
           script: |
+            set -e
+
+            echo ">> Deploying branch: $BRANCH"
             cd ${{ secrets.VPS_PROJECT_PATH }}
-            git pull origin main
-            docker compose build
-            docker compose run --rm payload npx payload migrate
-            docker compose up -d
+
+            git fetch origin
+            git checkout $BRANCH
+            git reset --hard origin/$BRANCH
+
+            cd client-cms
+
+            echo ">> Installing dependencies"
+            npm install --no-audit --no-fund
+
+            echo ">> Applying database migrations"
+            npm run migrate
+
+            echo ">> Building standalone bundle"
+            npm run build
+
+            echo ">> Restarting PM2 process"
+            pm2 delete teecrown-cms || true
+            pm2 start .next/standalone/server.js --name teecrown-cms
+            pm2 save
+
+            echo ">> Final status"
+            pm2 status teecrown-cms
+        env:
+          BRANCH: ${{ github.ref_name }}
