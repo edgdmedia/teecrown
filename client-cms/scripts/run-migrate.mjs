@@ -17,10 +17,8 @@ await build({
   entryPoints: [
     'src/scripts/run-migrations.ts',
     'src/payload.config.payload.ts',
-    'src/collections/Pages.ts',
     'src/collections/Posts.ts',
     'src/collections/TourPackages.ts',
-    'src/collections/Services.ts',
     'src/collections/Testimonials.ts',
     'src/collections/Media.ts',
     'src/collections/Users.ts',
