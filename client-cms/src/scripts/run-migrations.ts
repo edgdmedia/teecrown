@@ -20,7 +20,7 @@ async function main() {
 
   await payload.db.migrate({
     forceAcceptWarning: true,
-  })
+  } as { forceAcceptWarning: true } & Parameters<typeof payload.db.migrate>[0])
   await payload.destroy()
 }
 
