@@ -327,7 +327,7 @@ Already wired into the `Pages` collection's `hooks.afterChange` in step 1.3 — 
 
 ## Part 4 — GitHub → VPS deploy pipeline
 
-Cloudflare Workers Builds (used for the frontend) doesn't apply here — a VPS needs its own deploy mechanism. The equivalent, same-shape flow: work on **`development`** → push → **automatic deploy via GitHub Actions**, which SSHs into the VPS, pulls the branch, installs deps, applies migrations, builds the standalone bundle and restarts the PM2 process. The workflow also fires on pushes to `main` and can be triggered manually from the Actions tab.
+Cloudflare Workers Builds (used for the frontend) doesn't apply here — a VPS needs its own deploy mechanism. The equivalent, same-shape flow: work on **`development`** → open a PR to **`main`** → merging the PR triggers **automatic deploy via GitHub Actions**, which SSHs into the VPS, pulls `main`, installs deps, applies migrations, builds the standalone bundle and restarts the PM2 process. The workflow can also be triggered manually from the Actions tab (e.g. to re-deploy the current `main`).
 
 The CMS runs on the VPS under **PM2** (not Docker), serving the `.next/standalone` build produced by `next build`. Deploys are a no-downtime sequence run from the `client-cms/` directory.
 
@@ -370,7 +370,7 @@ name: Deploy Payload CMS
 
 on:
   push:
-    branches: [development, main]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -429,9 +429,9 @@ jobs:
 
 ### 4.4 The resulting flow
 
-1. Work happens on `development`, pushed freely — each push triggers a deploy.
-2. Review as normal; merging `development` → `main` also triggers a deploy with the same pipeline.
-3. The workflow SSHs into the VPS → pulls the branch → installs deps → runs migrations → builds the standalone bundle → restarts the `teecrown-cms` PM2 process and runs `pm2 save`.
+1. Work happens on `development`, pushed freely — no deploy happens yet.
+2. Open a PR from `development` → `main`. Review as normal.
+3. Merging the PR → GitHub Actions triggers automatically → SSHs into the VPS → pulls `main` → installs deps → runs migrations → builds the standalone bundle → restarts the `teecrown-cms` PM2 process and runs `pm2 save`. Manual deploys via the Actions tab re-run the same pipeline against `main`.
 4. Payload picks up the change; the on-demand revalidation hook (Part 3) still fires normally on the next content edit, independent of code deploys.
 
 Same mental model as the Cloudflare side (`development` → live), just a different mechanism under the hood since a VPS has no native git-integrated build system the way Workers does.

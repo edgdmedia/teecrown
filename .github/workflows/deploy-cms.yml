@@ -19,7 +19,7 @@ name: Deploy Payload CMS
 
 on:
   push:
-    branches: [development, main]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
