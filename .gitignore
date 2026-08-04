@@ -54,3 +54,4 @@ client-cms/node_modules
 client-cms/.next
 client-cms/dist
 client-cms/media
+client-cms/.payload-tmp
