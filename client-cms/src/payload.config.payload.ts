@@ -2,10 +2,8 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
-import { Pages } from './collections/Pages.js'
 import { Posts } from './collections/Posts.js'
 import { TourPackages } from './collections/TourPackages.js'
-import { Services } from './collections/Services.js'
 import { Testimonials } from './collections/Testimonials.js'
 import { Media } from './collections/Media.js'
 import { Users } from './collections/Users.js'
@@ -13,7 +11,7 @@ import { ContactSubmissions } from './collections/ContactSubmissions.js'
 
 const config: Parameters<typeof buildConfig>[0] = {
   admin: { user: Users.slug },
-  collections: [Users, Pages, Posts, TourPackages, Services, Testimonials, Media, ContactSubmissions],
+  collections: [Users, Posts, TourPackages, Testimonials, Media, ContactSubmissions],
   editor: lexicalEditor({}),
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URI ?? '' },
