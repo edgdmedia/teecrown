@@ -2,15 +2,14 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
-import { migrations } from './migrations'
-import { Pages } from './collections/Pages'
-import { Posts } from './collections/Posts'
-import { TourPackages } from './collections/TourPackages'
-import { Services } from './collections/Services'
-import { Testimonials } from './collections/Testimonials'
-import { Media } from './collections/Media'
-import { Users } from './collections/Users'
-import { ContactSubmissions } from './collections/ContactSubmissions'
+import { Pages } from './collections/Pages.js'
+import { Posts } from './collections/Posts.js'
+import { TourPackages } from './collections/TourPackages.js'
+import { Services } from './collections/Services.js'
+import { Testimonials } from './collections/Testimonials.js'
+import { Media } from './collections/Media.js'
+import { Users } from './collections/Users.js'
+import { ContactSubmissions } from './collections/ContactSubmissions.js'
 
 const config: Parameters<typeof buildConfig>[0] = {
   admin: { user: Users.slug },
@@ -19,7 +18,6 @@ const config: Parameters<typeof buildConfig>[0] = {
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URI ?? '' },
     push: process.env.NODE_ENV !== 'production',
-    prodMigrations: migrations,
   }),
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
   cookiePrefix: 'payload',

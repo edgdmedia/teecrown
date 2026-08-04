@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build && mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/ && if [ -d public ]; then cp -r public .next/standalone/; fi",
     "start": "next start",
-    "migrate:create": "payload migrate:create",
-    "migrate": "payload migrate"
+    "migrate:create": "node ./scripts/run-create-migration.mjs",
+    "migrate": "node ./scripts/run-migrate.mjs"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",
