@@ -27,12 +27,15 @@ const config: Parameters<typeof buildConfig>[0] = {
   secret: process.env.PAYLOAD_SECRET ?? '',
 }
 
-if (process.env.SMTP_HOST) {
+const smtpHost = process.env.SMTP_HOST?.trim()
+const smtpEnabled = process.env.PAYLOAD_ENABLE_SMTP !== 'false'
+
+if (smtpEnabled && smtpHost) {
   config.email = nodemailerAdapter({
     defaultFromAddress: process.env.EMAIL_FROM ?? 'noreply@teecrownconsult.org',
     defaultFromName: process.env.EMAIL_FROM_NAME ?? "Tee'Crown Consult",
     transportOptions: {
-      host: process.env.SMTP_HOST,
+      host: smtpHost,
       port: Number(process.env.SMTP_PORT) || 587,
       auth: { user: process.env.SMTP_USER ?? '', pass: process.env.SMTP_PASS ?? '' },
     },
