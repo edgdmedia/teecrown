@@ -327,15 +327,27 @@ Already wired into the `Pages` collection's `hooks.afterChange` in step 1.3 — 
 
 ## Part 4 — GitHub → VPS deploy pipeline
 
-Cloudflare Workers Builds (used for the frontend) doesn't apply here — a VPS needs its own deploy mechanism. The equivalent, same-shape flow: **`development` branch → PR → `main` → automatic deploy**, implemented via a GitHub Actions workflow that SSHs into the VPS on every push to `main`.
+Cloudflare Workers Builds (used for the frontend) doesn't apply here — a VPS needs its own deploy mechanism. The equivalent, same-shape flow: work on **`development`** → open a PR to **`main`** → merging the PR triggers **automatic deploy via GitHub Actions**, which SSHs into the VPS, pulls `main`, installs deps, applies migrations, builds the standalone bundle and restarts the PM2 process. The workflow can also be triggered manually from the Actions tab (e.g. to re-deploy the current `main`).
+
+The CMS runs on the VPS under **PM2** (not Docker), serving the `.next/standalone` build produced by `next build`. Deploys are a no-downtime sequence run from the `client-cms/` directory.
 
 ### 4.1 Generate a deploy key
 
 On the VPS:
 ```bash
-ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_actions_deploy -N ""
+ssh-keygen -t ed25519 -C "teecrown-github-actions-deploy" -f ~/.ssh/github_actions_deploy -N ""
 cat ~/.ssh/github_actions_deploy.pub >> ~/.ssh/authorized_keys
-cat ~/.ssh/github_actions_deploy   # copy this private key — goes into GitHub Secrets next
+```
+
+Then from your local machine, **fetch the full private key** (the entire `-----BEGIN OPENSSH PRIVATE KEY-----` … `-----END OPENSSH PRIVATE KEY-----` block, newlines included — a one-line blob will fail with `ssh.ParsePrivateKey: ssh: no key found`):
+```bash
+ssh <VPS_USER>@<VPS_HOST> "cat ~/.ssh/github_actions_deploy"
+```
+
+Permissions matter — verify on the VPS:
+```bash
+chmod 700 ~/.ssh && chmod 600 ~/.ssh/github_actions_deploy
+grep -q teecrown-github-actions-deploy ~/.ssh/authorized_keys && echo "pubkey authorized" || echo "MISSING: run: cat ~/.ssh/github_actions_deploy.pub >> ~/.ssh/authorized_keys"
 ```
 
 ### 4.2 Add GitHub repository secrets
@@ -343,8 +355,12 @@ cat ~/.ssh/github_actions_deploy   # copy this private key — goes into GitHub 
 In the repo → **Settings → Secrets and variables → Actions**, add:
 - `VPS_HOST` — the VPS IP or hostname
 - `VPS_USER` — the SSH user
-- `VPS_SSH_KEY` — the private key generated above
-- `VPS_PROJECT_PATH` — e.g. `/home/user/client-cms`
+- `VPS_SSH_KEY` — the **full private key block** from 4.1
+- `VPS_PROJECT_PATH` — the repo root on the VPS, e.g. `/home/teecrownconsult/teecrown` (the workflow `cd`s into `client-cms/` inside it)
+- `VPS_PORT` — *optional*, SSH port, defaults to `22` if unset
+- `VPS_FINGERPRINT` — *optional*, server host key fingerprint for stricter host verification
+
+Connectivity check: GitHub Actions runners must be able to reach `VPS_HOST` on the SSH port. If the run logs `connect: connection refused`, open that port to the runner in the firewall / security group (or set `VPS_PORT` to the real port).
 
 ### 4.3 Workflow file
 
@@ -355,6 +371,11 @@ name: Deploy Payload CMS
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: cms-deploy
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -366,24 +387,54 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || '22' }}
+          fingerprint: ${{ secrets.VPS_FINGERPRINT || '' }}
+          script_stop: true
+          timeout: 30s
+          command_timeout: 30m
+          envs: BRANCH
           script: |
+            set -e
+
+            echo ">> Deploying branch: $BRANCH"
             cd ${{ secrets.VPS_PROJECT_PATH }}
-            git pull origin main
-            docker compose build
-            docker compose run --rm payload npx payload migrate
-            docker compose up -d
+
+            git fetch origin
+            git checkout $BRANCH
+            git reset --hard origin/$BRANCH
+
+            cd client-cms
+
+            echo ">> Installing dependencies"
+            npm install --no-audit --no-fund
+
+            echo ">> Applying database migrations"
+            npm run migrate
+
+            echo ">> Building standalone bundle"
+            npm run build
+
+            echo ">> Restarting PM2 process"
+            pm2 delete teecrown-cms || true
+            pm2 start .next/standalone/server.js --name teecrown-cms
+            pm2 save
+
+            echo ">> Final status"
+            pm2 status teecrown-cms
+        env:
+          BRANCH: ${{ github.ref_name }}
 ```
 
-The `docker compose run --rm payload npx payload migrate` line checks for and applies any pending migrations **before** the app restarts with the new code — and is a safe no-op if there's nothing to migrate (per 1.4.5 above), so it runs unconditionally on every deploy without needing any "is there a migration this time" logic.
+`npm run migrate` checks for and applies any pending migrations **before** the new bundle restarts — a safe no-op if there's nothing to migrate (per 1.4.5 above), so it runs unconditionally on every deploy. `script_stop: true` + `set -e` make the run fail fast if a migration errors, before any restart. `git reset --hard` keeps the server's working tree identical to the pushed branch (`.env` is untracked/ignored and is untouched).
 
 ### 4.4 The resulting flow
 
-1. Work happens on `development`, pushed freely.
-2. Open a PR from `development` → `main`. Review as normal — no deploy happens yet.
-3. Merge to `main` → GitHub Actions triggers automatically → SSHs into the VPS → pulls latest code → rebuilds and restarts the Docker containers.
+1. Work happens on `development`, pushed freely — no deploy happens yet.
+2. Open a PR from `development` → `main`. Review as normal.
+3. Merging the PR → GitHub Actions triggers automatically → SSHs into the VPS → pulls `main` → installs deps → runs migrations → builds the standalone bundle → restarts the `teecrown-cms` PM2 process and runs `pm2 save`. Manual deploys via the Actions tab re-run the same pipeline against `main`.
 4. Payload picks up the change; the on-demand revalidation hook (Part 3) still fires normally on the next content edit, independent of code deploys.
 
-Same mental model as the Cloudflare side (`development` → PR → `main` → live), just a different mechanism under the hood since a VPS has no native git-integrated build system the way Workers does.
+Same mental model as the Cloudflare side (`development` → live), just a different mechanism under the hood since a VPS has no native git-integrated build system the way Workers does.
 
 **One thing still worth verifying manually:** the workflow updates code and applies schema migrations automatically, but it does **not** manage `.env` changes — if a new feature needs a new environment variable, add it to the VPS's `.env` file yourself before merging the PR that depends on it. Secrets should never live in the repo, so this one step stays manual by design.
 
