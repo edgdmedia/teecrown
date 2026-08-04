@@ -25,6 +25,7 @@ const config: Parameters<typeof buildConfig>[0] = {
     ...(process.env.CORS_ORIGINS?.split(',') ?? []),
   ],
   secret: process.env.PAYLOAD_SECRET ?? '',
+  telemetry: false,
 }
 
 const smtpHost = process.env.SMTP_HOST?.trim()
