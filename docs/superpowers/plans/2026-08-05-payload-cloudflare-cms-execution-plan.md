@@ -608,6 +608,8 @@ git commit -m "feat: add web revalidation infrastructure"
 
 > The Payload REST API returns array fields as rows (`gallery: [{ src }]`, `included: [{ item }]`, `pricing: [{ label, value }]`) and richText fields already in Lexical form, and it paginates at 10 docs/page by default — so the fetch needs a `limit` param and the mappers must unwrap rows and pass richText through.
 
+> **Tags must be attached per-fetch**: `revalidateTag('tours')` only invalidates cache entries stored with `tags: ['tours']`. `fetchDocs` therefore takes the tag name and passes it to `next.tags`.
+
 - [ ] **Step 1: Replace local reads with tagged REST fetches + mappers**
 
 Replace `apps/web/src/lib/cms.ts` with:
@@ -694,9 +696,9 @@ function mapTestimonial(doc: Testimonial): Testimonial {
   }
 }
 
-async function fetchDocs<T>(collection: string): Promise<T[]> {
+async function fetchDocs<T>(collection: string, tag: string): Promise<T[]> {
   const res = await fetch(`${PAYLOAD_URL}/api/${collection}?limit=1000`, {
-    next: { revalidate: 3600 },
+    next: { revalidate: 3600, tags: [tag] },
   })
   if (!res.ok) throw new Error(`CMS fetch failed for ${collection}: ${res.status}`)
   const data = await res.json()
@@ -708,7 +710,7 @@ async function fetchDocs<T>(collection: string): Promise<T[]> {
 
 ```ts
 export async function getTourPackages(): Promise<Package[]> {
-  const docs = await fetchDocs<ApiTour>('tour-packages')
+  const docs = await fetchDocs<ApiTour>('tour-packages', 'tours')
   return docs.map(mapPackage)
 }
 
@@ -718,7 +720,7 @@ export async function getTourPackage(slug: string): Promise<Package | undefined>
 }
 
 export async function getPosts(): Promise<BlogPost[]> {
-  const docs = await fetchDocs<ApiPost>('posts')
+  const docs = await fetchDocs<ApiPost>('posts', 'posts')
   return docs.map(mapPost).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
 
@@ -728,12 +730,12 @@ export async function getPost(slug: string): Promise<BlogPost | undefined> {
 }
 
 export async function getTestimonials(): Promise<Testimonial[]> {
-  const docs = await fetchDocs<Testimonial>('testimonials')
+  const docs = await fetchDocs<Testimonial>('testimonials', 'testimonials')
   return docs.map(mapTestimonial)
 }
 ```
 
-Revalidation tags (`tours`, `posts`, `testimonials`) are set centrally in the `triggerRevalidation` hook mapping, not per-fetch, so `fetchDocs` stays tag-agnostic.
+The tag per fetch (`tours`, `posts`, `testimonials`) matches what the Payload `triggerRevalidation` hook sends to the `/api/revalidate` route.
 
 - [ ] **Step 3: Keep runtime env usage server-side only**
 
