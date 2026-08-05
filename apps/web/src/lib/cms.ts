@@ -1,28 +1,40 @@
-import { readJsonDirectory } from '@/content/config'
 import type { Package, PricingRow, ItineraryDay } from '@/data/packages'
 import type { BlogPost } from '@/data/blog'
 import type { Testimonial } from '@/data/testimonials'
 
-interface ContentPackage {
+const PAYLOAD_URL = process.env.PAYLOAD_URL!
+
+interface LexicalDocument {
+  root: {
+    type: string
+    children: unknown[]
+    direction: 'ltr' | 'rtl' | null
+    format: string
+    indent: number
+    version: number
+  }
+}
+
+interface ApiTour {
   slug: string
   title: string
   location: string
   image: string
   duration: string
-  gallery: string[]
+  gallery?: Array<{ src: string }>
   excerpt: string
   tag: string
-  intro?: string
-  included?: string[]
-  highlights?: string[]
+  intro?: LexicalDocument | null
   pricing?: PricingRow[]
-  itinerary?: ItineraryDay[]
-  requirements?: string[]
-  hashtags?: string[]
   validUntil?: string
+  included?: Array<{ item: string }>
+  highlights?: Array<{ item: string }>
+  requirements?: Array<{ item: string }>
+  itinerary?: ItineraryDay[]
+  hashtags?: Array<{ item: string }>
 }
 
-interface ContentPost {
+interface ApiPost {
   slug: string
   category: string
   title: string
@@ -30,72 +42,46 @@ interface ContentPost {
   date: string
   author: string
   excerpt: string
-  body?: string
+  body?: LexicalDocument | null
 }
 
-function paragraph(text: string) {
+function mapPackage(doc: ApiTour): Package {
   return {
-    type: 'paragraph' as const,
-    children: [{ type: 'text' as const, text, format: 0, detail: 0, mode: 'normal' as const, style: '', version: 1 }],
-    direction: 'ltr' as const,
-    format: '',
-    indent: 0,
-    version: 1,
-  }
-}
-
-function toLexicalDocument(text?: string | null) {
-  if (!text) return null
-  const paragraphs = text.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean)
-  return {
-    root: {
-      type: 'root' as const,
-      children: paragraphs.map(paragraph),
-      direction: 'ltr' as const,
-      format: '',
-      indent: 0,
-      version: 1,
-    },
-  }
-}
-
-function mapPackage(pkg: ContentPackage): Package {
-  return {
-    slug: pkg.slug,
-    title: pkg.title,
-    location: pkg.location,
-    image: pkg.image,
-    duration: pkg.duration,
-    gallery: pkg.gallery,
-    excerpt: pkg.excerpt,
-    tag: pkg.tag,
+    slug: doc.slug,
+    title: doc.title,
+    location: doc.location,
+    image: doc.image,
+    duration: doc.duration,
+    gallery: (doc.gallery ?? []).map((row) => row.src),
+    excerpt: doc.excerpt,
+    tag: doc.tag,
     content: {
-      intro: toLexicalDocument(pkg.intro),
-      included: pkg.included,
-      highlights: pkg.highlights,
-      pricing: pkg.pricing,
-      itinerary: pkg.itinerary,
-      requirements: pkg.requirements,
-      hashtags: pkg.hashtags,
-      validUntil: pkg.validUntil,
+      intro: doc.intro ?? null,
+      included: (doc.included ?? []).map((row) => row.item),
+      highlights: (doc.highlights ?? []).map((row) => row.item),
+      pricing: doc.pricing ?? [],
+      itinerary: doc.itinerary ?? [],
+      requirements: (doc.requirements ?? []).map((row) => row.item),
+      hashtags: (doc.hashtags ?? []).map((row) => row.item),
+      validUntil: doc.validUntil,
     },
   }
 }
 
-function mapPost(post: ContentPost): BlogPost {
+function mapPost(doc: ApiPost): BlogPost {
   return {
-    slug: post.slug,
-    category: post.category,
-    title: post.title,
-    image: post.image,
-    date: post.date,
-    author: post.author,
-    excerpt: post.excerpt,
-    body: toLexicalDocument(post.body),
+    slug: doc.slug,
+    category: doc.category,
+    title: doc.title,
+    image: doc.image,
+    date: doc.date,
+    author: doc.author,
+    excerpt: doc.excerpt,
+    body: doc.body ?? null,
   }
 }
 
-function mapTestimonial(doc: Testimonial & { slug?: string }): Testimonial {
+function mapTestimonial(doc: Testimonial): Testimonial {
   return {
     rating: Number(doc.rating ?? 5),
     name: doc.name,
@@ -104,31 +90,38 @@ function mapTestimonial(doc: Testimonial & { slug?: string }): Testimonial {
   }
 }
 
+async function fetchDocs<T>(collection: string, tag: string): Promise<T[]> {
+  const res = await fetch(`${PAYLOAD_URL}/api/${collection}?limit=1000`, {
+    next: { revalidate: 3600, tags: [tag] },
+  })
+  if (!res.ok) throw new Error(`CMS fetch failed for ${collection}: ${res.status}`)
+  const data = await res.json()
+  return data.docs as T[]
+}
+
 // ── Exports ──────────────────────────────────────────────────────
 
 export async function getTourPackages(): Promise<Package[]> {
-  const packages = await readJsonDirectory<ContentPackage>('tours')
-  return packages.map(mapPackage)
+  const docs = await fetchDocs<ApiTour>('tour-packages', 'tours')
+  return docs.map(mapPackage)
 }
 
 export async function getTourPackage(slug: string): Promise<Package | undefined> {
   const all = await getTourPackages()
-  return all.find(p => p.slug === slug)
+  return all.find((p) => p.slug === slug)
 }
 
 export async function getPosts(): Promise<BlogPost[]> {
-  const posts = await readJsonDirectory<ContentPost>('blog')
-  return posts
-    .map(mapPost)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  const docs = await fetchDocs<ApiPost>('posts', 'posts')
+  return docs.map(mapPost).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
 
 export async function getPost(slug: string): Promise<BlogPost | undefined> {
   const all = await getPosts()
-  return all.find(p => p.slug === slug)
+  return all.find((p) => p.slug === slug)
 }
 
 export async function getTestimonials(): Promise<Testimonial[]> {
-  const testimonials = await readJsonDirectory<Testimonial & { slug?: string }>('testimonials')
-  return testimonials.map(mapTestimonial)
+  const docs = await fetchDocs<Testimonial>('testimonials', 'testimonials')
+  return docs.map(mapTestimonial)
 }
