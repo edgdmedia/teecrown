@@ -1,7 +1,7 @@
 {
-  "name": "with-cloudflare-d1",
+  "name": "teecrownconsult-cms",
   "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
+  "description": "Payload CMS for teecrownconsult on Cloudflare Workers",
   "license": "MIT",
   "type": "module",
   "scripts": {

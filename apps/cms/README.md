@@ -1,26 +1,19 @@
-# Payload Cloudflare Template
+# TeeCrown Consult CMS (Payload on Cloudflare)
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/payloadcms/payload/tree/3.x/templates/with-cloudflare-d1)
+Payload CMS backend for the TeeCrown Consult site (`apps/web`), deployed on Cloudflare Workers with a D1 database and R2 media storage.
 
-**This can only be deployed on Paid Workers right now due to size limits.** This template comes configured with the bare minimum to get started on anything you need.
+**This can only be deployed on Paid Workers right now due to size limits.**
 
-## Quick start
+## Local development
 
-This template can be deployed directly to Cloudflare Workers by clicking the button to take you to the setup screen.
+Requires Node >= 24.15 (e.g. `nvm use 24.15.0`).
 
-From there you can connect your code to a git provider such Github or Gitlab, name your Workers, D1 Database and R2 Bucket as well as attach any additional environment variables or services you need.
+```bash
+pnpm install
+pnpm dev
+```
 
-## Quick Start - local setup
-
-To spin up this template locally, follow these steps:
-
-### Clone
-
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. Cloudflare will connect your app to a git provider such as Github and you can access your code from there.
-
-### Local Development
-
-## How it works
+This starts Next/Payload locally; Wrangler creates local D1/R2 bindings automatically. See `AGENTS.md` for the full local test loop against `apps/web`.
 
 Out of the box, using [`Wrangler`](https://developers.cloudflare.com/workers/wrangler/) will automatically create local bindings for you to connect to the remote services and it can even create a local mock of the services you're using with Cloudflare.
 
