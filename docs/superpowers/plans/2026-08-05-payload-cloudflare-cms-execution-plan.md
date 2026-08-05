@@ -39,7 +39,7 @@
 - Modify: `apps/cms/wrangler.jsonc`
 - Modify: `apps/cms/README.md`
 
-- [ ] **Step 1: Update package identity and worker placeholders**
+- [x] **Step 1: Update package identity and worker placeholders**
 
 Set the package and worker names away from template defaults.
 
@@ -72,7 +72,7 @@ Set `apps/cms/wrangler.jsonc` names like:
 }
 ```
 
-- [ ] **Step 2: Add a staging environment block**
+- [x] **Step 2: Add a staging environment block**
 
 Add the template-style staging env block:
 
@@ -98,7 +98,7 @@ Add the template-style staging env block:
 }
 ```
 
-- [ ] **Step 3: Install dependencies**
+- [x] **Step 3: Install dependencies**
 
 Run: `pnpm install`
 
@@ -106,7 +106,7 @@ Workdir: `apps/cms`
 
 Expected: `pnpm-lock.yaml` created and install completes without missing package errors.
 
-- [ ] **Step 4: Generate types**
+- [x] **Step 4: Generate types**
 
 Run: `pnpm run generate:types`
 
@@ -114,7 +114,7 @@ Workdir: `apps/cms`
 
 Expected: `cloudflare-env.d.ts` and `src/payload-types.ts` generated successfully.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/cms/package.json apps/cms/wrangler.jsonc apps/cms/README.md apps/cms/pnpm-lock.yaml apps/cms/cloudflare-env.d.ts apps/cms/src/payload-types.ts
@@ -129,7 +129,7 @@ git commit -m "chore: normalize cms scaffold"
 - Modify: `apps/cms/src/payload.config.ts`
 - Modify: `apps/cms/src/collections/Media.ts`
 
-- [ ] **Step 1: Keep the template's runtime/CLI fallback exactly**
+- [x] **Step 1: Keep the template's runtime/CLI fallback exactly**
 
 Ensure `apps/cms/src/payload.config.ts` keeps this shape:
 
@@ -154,7 +154,7 @@ function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
 }
 ```
 
-- [ ] **Step 2: Keep the template's top-level `plugins` wiring — R2 is a plugin, not a `storage` key**
+- [x] **Step 2: Keep the template's top-level `plugins` wiring — R2 is a plugin, not a `storage` key**
 
 Verified against the official `with-cloudflare-d1` template (`payloadcms/payload@3.x`) and the installed `payload@3.82.1` type declarations: `r2Storage` is a `Plugin`, and `Config` has **no** top-level `storage` property. The scaffold's committed `storage:` array is a type error — use the template's `plugins:` wiring:
 
@@ -183,7 +183,7 @@ export default buildConfig({
 })
 ```
 
-- [ ] **Step 3: Make Media Workers-safe**
+- [x] **Step 3: Make Media Workers-safe**
 
 Set `apps/cms/src/collections/Media.ts` to:
 
@@ -206,7 +206,7 @@ export const Media: CollectionConfig = {
 }
 ```
 
-- [ ] **Step 4: Verify config compiles**
+- [x] **Step 4: Verify config compiles**
 
 Run: `pnpm run generate:types:payload`
 
@@ -214,7 +214,7 @@ Workdir: `apps/cms`
 
 Expected: Payload config loads, no D1/R2 adapter shape errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/cms/src/payload.config.ts apps/cms/src/collections/Media.ts apps/cms/src/payload-types.ts
@@ -234,7 +234,7 @@ git commit -m "chore: align cms config for cloudflare"
 - Create: `apps/cms/src/collections/ContactSubmissions.ts`
 - Create: `apps/cms/src/hooks/triggerRevalidation.ts`
 
-- [ ] **Step 1: Create the revalidation hook**
+- [x] **Step 1: Create the revalidation hook**
 
 Create `apps/cms/src/hooks/triggerRevalidation.ts`:
 
@@ -252,7 +252,7 @@ export const triggerRevalidation: CollectionAfterChangeHook = async ({ collectio
 }
 ```
 
-- [ ] **Step 2: Define `TourPackages`**
+- [x] **Step 2: Define `TourPackages`**
 
 Create `apps/cms/src/collections/TourPackages.ts`. Every field below is required by the web `Package` type (`apps/web/src/data/packages.ts`) and the rendered tour page — do not drop any:
 
@@ -292,7 +292,7 @@ export const TourPackages: CollectionConfig = {
 }
 ```
 
-- [ ] **Step 3: Define `Posts`, `Testimonials`, and `ContactSubmissions`**
+- [x] **Step 3: Define `Posts`, `Testimonials`, and `ContactSubmissions`**
 
 Create collection files matching the web `BlogPost` and `Testimonial` types:
 
@@ -350,7 +350,7 @@ export const ContactSubmissions: CollectionConfig = {
 
 Attach `triggerRevalidation` only to collections that affect rendered site pages (`tour-packages`, `posts`, `testimonials`). `contact-submissions` does not get the hook.
 
-- [ ] **Step 4: Register the collections in `payload.config.ts`**
+- [x] **Step 4: Register the collections in `payload.config.ts`**
 
 Update:
 
@@ -358,7 +358,7 @@ Update:
 collections: [Users, Media, Posts, TourPackages, Testimonials, ContactSubmissions],
 ```
 
-- [ ] **Step 5: Generate types and inspect failures**
+- [x] **Step 5: Generate types and inspect failures**
 
 Run: `pnpm run generate:types:payload`
 
@@ -366,7 +366,7 @@ Workdir: `apps/cms`
 
 Expected: payload types regenerate with the new collections.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/cms/src/collections apps/cms/src/hooks/triggerRevalidation.ts apps/cms/src/payload.config.ts apps/cms/src/payload-types.ts
@@ -381,7 +381,7 @@ git commit -m "feat: define cms collections"
 - Create: `apps/cms/src/lib/content-mappers.ts`
 - Create: `apps/cms/scripts/seed-from-repo-json.ts`
 
-- [ ] **Step 1: Create mapper helpers**
+- [x] **Step 1: Create mapper helpers**
 
 Create `apps/cms/src/lib/content-mappers.ts`. These map repo JSON (`apps/web/src/content/**`, shape verified against `singapore.json` / `turkey-guide.json` / testimonials) to the Payload collection input shapes. Array fields are stored as Payload `array` rows, so wrap each item in the row's field name:
 
@@ -458,7 +458,7 @@ export function toLexical(text?: string | null): RichText | null {
 }
 ```
 
-- [ ] **Step 2: Create the seed script**
+- [x] **Step 2: Create the seed script**
 
 Create `apps/cms/scripts/seed-from-repo-json.ts`:
 
@@ -497,7 +497,7 @@ for (const postDoc of (await readDir('blog')).map(mapPost)) await post('posts', 
 for (const testimonial of (await readDir('testimonials')).map(mapTestimonial)) await post('testimonials', testimonial)
 ```
 
-- [ ] **Step 3: Add a one-off script entry**
+- [x] **Step 3: Add a one-off script entry**
 
 Update `apps/cms/package.json` scripts:
 
@@ -505,7 +505,7 @@ Update `apps/cms/package.json` scripts:
 "seed:repo-json": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-from-repo-json.ts"
 ```
 
-- [ ] **Step 4: Typecheck the script (do NOT run it yet)**
+- [x] **Step 4: Typecheck the script (do NOT run it yet)**
 
 The seed script needs a live CMS (staging), which is created in **Task 7**. For now, only verify it compiles:
 
@@ -517,7 +517,7 @@ Expected: no type errors (array field shapes line up with the mapped output).
 
 Actual seeding against staging happens in Task 7 Step 4, once staging resources exist.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/cms/src/lib/content-mappers.ts apps/cms/scripts/seed-from-repo-json.ts apps/cms/package.json
@@ -535,7 +535,7 @@ git commit -m "feat: add cms seed pipeline"
 
 > **Time-based ISR requires the revalidation Queue** (verified against OpenNext docs): the `doQueue` / `NEXT_CACHE_DO_QUEUE` binding and a `DOQueueHandler` migration must be added in addition to the tag cache. DO migrations must use `new_sqlite_classes` (not `new_classes`).
 
-- [ ] **Step 1: Add tag cache + queue to `open-next.config.ts`**
+- [x] **Step 1: Add tag cache + queue to `open-next.config.ts`**
 
 Set `apps/web/open-next.config.ts` to:
 
@@ -552,7 +552,7 @@ export default defineCloudflareConfig({
 })
 ```
 
-- [ ] **Step 2: Add the Durable Object bindings and migrations**
+- [x] **Step 2: Add the Durable Object bindings and migrations**
 
 Add to `apps/web/wrangler.jsonc` (matches the official OpenNext "large site using revalidation" config — the DO queue is a Durable Object, **not** a Cloudflare `queues` binding):
 
@@ -580,11 +580,11 @@ Add to `apps/web/wrangler.jsonc` (matches the official OpenNext "large site usin
 ],
 ```
 
-- [ ] **Step 3: Verify the existing revalidation route (keep it, do not overwrite)**
+- [x] **Step 3: Verify the existing revalidation route (keep it, do not overwrite)**
 
 `apps/web/src/app/api/revalidate/route.ts` already exists (committed in the scaffold). It uses `revalidateTag(tag, 'max')` (Next 16 recommended form) and returns 400 when `tag` is missing. Leave it as-is; just confirm the file is present and uses the `secret` query-param + `tag` body contract that the Payload `triggerRevalidation` hook will call.
 
-- [ ] **Step 4: Verify the web app still builds**
+- [x] **Step 4: Verify the web app still builds**
 
 Run: `pnpm run build`
 
@@ -592,7 +592,7 @@ Workdir: `apps/web`
 
 Expected: OpenNext config and wrangler config are accepted with the new tag cache + queue pieces.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/open-next.config.ts apps/web/wrangler.jsonc
@@ -610,7 +610,7 @@ git commit -m "feat: add web revalidation infrastructure"
 
 > **Tags must be attached per-fetch**: `revalidateTag('tours')` only invalidates cache entries stored with `tags: ['tours']`. `fetchDocs` therefore takes the tag name and passes it to `next.tags`.
 
-- [ ] **Step 1: Replace local reads with tagged REST fetches + mappers**
+- [x] **Step 1: Replace local reads with tagged REST fetches + mappers**
 
 Replace `apps/web/src/lib/cms.ts` with:
 
@@ -706,7 +706,7 @@ async function fetchDocs<T>(collection: string, tag: string): Promise<T[]> {
 }
 ```
 
-- [ ] **Step 2: Tagged getters**
+- [x] **Step 2: Tagged getters**
 
 ```ts
 export async function getTourPackages(): Promise<Package[]> {
@@ -737,11 +737,11 @@ export async function getTestimonials(): Promise<Testimonial[]> {
 
 The tag per fetch (`tours`, `posts`, `testimonials`) matches what the Payload `triggerRevalidation` hook sends to the `/api/revalidate` route.
 
-- [ ] **Step 3: Keep runtime env usage server-side only**
+- [x] **Step 3: Keep runtime env usage server-side only**
 
 Ensure the code reads `process.env.PAYLOAD_URL`, not `NEXT_PUBLIC_PAYLOAD_URL`.
 
-- [ ] **Step 4: Verify the site still builds**
+- [x] **Step 4: Verify the site still builds**
 
 Run: `pnpm run build`
 
@@ -749,7 +749,7 @@ Workdir: `apps/web`
 
 Expected: no broken imports from removed `readJsonDirectory` call sites (`cms.ts` is the only consumer; callers are `src/app/{page,tours/*,blog/*,sitemap}.tsx`).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/src/lib/cms.ts
