@@ -758,71 +758,73 @@ git commit -m "feat: fetch cms content from payload"
 
 ---
 
-### Task 7: Stage, Seed, And Validate End-To-End
+### Task 7: Deploy, Seed, And Validate End-To-End (production only — staging dropped)
 
 **Files:**
-- Modify: environment/config only as needed during setup
+- Modify: `apps/cms/wrangler.jsonc` — paste the real D1 `database_id` (currently a local placeholder UUID)
 
 - [ ] **Step 1: Create Cloudflare resources**
 
 Run:
 
 ```bash
-wrangler d1 create teecrownconsult-cms-staging
+cd apps/cms
 wrangler d1 create teecrownconsult-cms
-wrangler r2 bucket create teecrownconsult-media-staging
 wrangler r2 bucket create teecrownconsult-media
 ```
 
-Expected: concrete database IDs to paste into `apps/cms/wrangler.jsonc`.
+Expected: concrete database ID to paste into `apps/cms/wrangler.jsonc` (the `R2` bucket in the config is referenced by name and does not need an ID).
 
-- [ ] **Step 2: Set secrets for staging**
+- [ ] **Step 2: Set secrets**
 
 Run in `apps/cms`:
 
 ```bash
-wrangler secret put PAYLOAD_SECRET --env staging
-wrangler secret put REVALIDATE_SECRET --env staging
-wrangler secret put FRONTEND_REVALIDATE_URL --env staging
+wrangler secret put PAYLOAD_SECRET
+wrangler secret put REVALIDATE_SECRET
+wrangler secret put FRONTEND_REVALIDATE_URL
 ```
 
 And in `apps/web`:
 
 ```bash
-wrangler secret put REVALIDATE_SECRET --env staging
-wrangler secret put PAYLOAD_URL --env staging
+cd apps/web
+wrangler secret put REVALIDATE_SECRET
+wrangler secret put PAYLOAD_URL
 ```
 
-- [ ] **Step 3: Deploy staging CMS and staging web**
+`PAYLOAD_URL` is the deployed CMS worker's URL, e.g. `https://teecrownconsult-cms.<account-subdomain>.workers.dev` (or a custom domain if configured).
+
+- [ ] **Step 3: Deploy CMS and web**
 
 Run:
 
 ```bash
-cd apps/cms && CLOUDFLARE_ENV=staging pnpm run deploy
-cd apps/web && CLOUDFLARE_ENV=staging pnpm run deploy
+cd apps/cms && pnpm run deploy
+cd apps/web && pnpm run deploy
 ```
 
 Expected: both Workers deploy successfully.
 
-- [ ] **Step 4: Seed staging data**
+- [ ] **Step 4: Seed production data**
 
-Run:
+Create the first admin at `https://<cms-domain>/admin`, then run:
 
 ```bash
-cd apps/cms && PAYLOAD_URL=https://<staging-cms-domain> SEED_ADMIN_TOKEN=<token> pnpm run seed:repo-json
+cd apps/cms && PAYLOAD_URL=https://<cms-domain> SEED_ADMIN_TOKEN=<token> pnpm run seed:repo-json
 ```
 
-Expected: records are created in staging.
+Expected: records are created in production.
 
 - [ ] **Step 5: Verify the full edit-to-live loop**
 
 Manual checks:
 
 ```text
-1. Open staging CMS admin.
+1. Open CMS admin.
 2. Confirm CRUD on Posts, TourPackages, Testimonials, Media, ContactSubmissions.
 3. Edit one tour.
-4. Confirm staging site reflects the change within seconds.
+4. Confirm the site reflects the change within seconds.
 5. Upload media and confirm R2-backed access works.
 ```
 
@@ -830,15 +832,15 @@ Manual checks:
 
 ```bash
 git add apps/cms/wrangler.jsonc apps/web/wrangler.jsonc
-git commit -m "chore: configure staging cms deployment"
+git commit -m "chore: configure cms production deployment"
 ```
 
 ---
 
 ## Self-Review
 
-- Spec coverage: scaffold, D1/R2 wiring, logger, `skipSafeFetch`, seed mapping, runtime REST fetches, DO tag cache, revalidation route, staging deploy, and production go-live are all covered.
-- Placeholder scan: remaining placeholders are only environment-specific values that must be supplied at deploy time (`REPLACE_PROD_D1_ID`, staging URLs, tokens, secrets). No implementation placeholders remain.
+- Spec coverage: scaffold, D1/R2 wiring, logger, `skipSafeFetch`, seed mapping, runtime REST fetches, DO tag cache, revalidation route, production go-live are all covered.
+- Placeholder scan: remaining placeholders are only environment-specific values that must be supplied at deploy time (the D1 `database_id`, URLs, tokens, secrets). No implementation placeholders remain.
 - Type consistency: collection slugs, env var names, and revalidation tag names are consistent across tasks (`tour-packages` → `tours`, `PAYLOAD_URL`, `REVALIDATE_SECRET`).
 
 Plan complete and saved to `docs/superpowers/plans/2026-08-05-payload-cloudflare-cms-execution-plan.md`. Two execution options:
