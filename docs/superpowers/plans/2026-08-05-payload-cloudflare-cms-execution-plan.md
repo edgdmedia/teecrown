@@ -154,9 +154,9 @@ function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
 }
 ```
 
-- [ ] **Step 2: Keep the template's top-level `storage` wiring — do NOT move to `plugins`**
+- [ ] **Step 2: Keep the template's top-level `plugins` wiring — R2 is a plugin, not a `storage` key**
 
-The official `with-cloudflare-d1` template (verified at `payloadcms/payload@main`) wires R2 via the **top-level `storage` array**, not `plugins`. The scaffold already has this exact shape — leave it unchanged:
+Verified against the official `with-cloudflare-d1` template (`payloadcms/payload@3.x`) and the installed `payload@3.82.1` type declarations: `r2Storage` is a `Plugin`, and `Config` has **no** top-level `storage` property. The scaffold's committed `storage:` array is a type error — use the template's `plugins:` wiring:
 
 ```ts
 export default buildConfig({
@@ -166,7 +166,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, Posts, TourPackages, Testimonials, ContactSubmissions],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -174,7 +174,7 @@ export default buildConfig({
   },
   db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
   logger: isProduction ? cloudflareLogger : undefined,
-  storage: [
+  plugins: [
     r2Storage({
       bucket: cloudflare.env.R2,
       collections: { media: true },
