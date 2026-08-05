@@ -154,20 +154,27 @@ function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
 }
 ```
 
-- [ ] **Step 2: Normalize storage wiring to the project plan**
+- [ ] **Step 2: Keep the template's top-level `storage` wiring — do NOT move to `plugins`**
 
-Use the R2 plugin wiring in the config body:
+The official `with-cloudflare-d1` template (verified at `payloadcms/payload@main`) wires R2 via the **top-level `storage` array**, not `plugins`. The scaffold already has this exact shape — leave it unchanged:
 
 ```ts
 export default buildConfig({
-  admin: { user: Users.slug, importMap: { baseDir: path.resolve(dirname) } },
+  admin: {
+    user: Users.slug,
+    importMap: {
+      baseDir: path.resolve(dirname),
+    },
+  },
   collections: [Users, Media],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
-  typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
+  typescript: {
+    outputFile: path.resolve(dirname, 'payload-types.ts'),
+  },
   db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
   logger: isProduction ? cloudflareLogger : undefined,
-  plugins: [
+  storage: [
     r2Storage({
       bucket: cloudflare.env.R2,
       collections: { media: true },
@@ -247,7 +254,7 @@ export const triggerRevalidation: CollectionAfterChangeHook = async ({ collectio
 
 - [ ] **Step 2: Define `TourPackages`**
 
-Create `apps/cms/src/collections/TourPackages.ts` with a minimal shape that matches current site content:
+Create `apps/cms/src/collections/TourPackages.ts`. Every field below is required by the web `Package` type (`apps/web/src/data/packages.ts`) and the rendered tour page — do not drop any:
 
 ```ts
 import type { CollectionConfig } from 'payload'
@@ -260,12 +267,26 @@ export const TourPackages: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true, unique: true },
-    { name: 'summary', type: 'textarea' },
-    { name: 'price', type: 'text' },
-    { name: 'duration', type: 'text' },
-    { name: 'location', type: 'text' },
-    { name: 'featuredImage', type: 'upload', relationTo: 'media' },
-    { name: 'content', type: 'richText' },
+    { name: 'location', type: 'text', required: true },
+    { name: 'image', type: 'text', required: true },
+    { name: 'duration', type: 'text', required: true },
+    { name: 'gallery', type: 'array', fields: [{ name: 'src', type: 'text', required: true }] },
+    { name: 'excerpt', type: 'textarea', required: true },
+    { name: 'tag', type: 'text', required: true },
+    { name: 'intro', type: 'richText' },
+    { name: 'pricing', type: 'array', fields: [
+      { name: 'label', type: 'text', required: true },
+      { name: 'value', type: 'text', required: true },
+    ] },
+    { name: 'validUntil', type: 'text' },
+    { name: 'included', type: 'array', fields: [{ name: 'item', type: 'text', required: true }] },
+    { name: 'highlights', type: 'array', fields: [{ name: 'item', type: 'text', required: true }] },
+    { name: 'requirements', type: 'array', fields: [{ name: 'item', type: 'text', required: true }] },
+    { name: 'itinerary', type: 'array', fields: [
+      { name: 'day', type: 'text', required: true },
+      { name: 'description', type: 'text', required: true },
+    ] },
+    { name: 'hashtags', type: 'array', fields: [{ name: 'item', type: 'text', required: true }] },
   ],
   hooks: { afterChange: [triggerRevalidation] },
 }
@@ -273,34 +294,61 @@ export const TourPackages: CollectionConfig = {
 
 - [ ] **Step 3: Define `Posts`, `Testimonials`, and `ContactSubmissions`**
 
-Create collection files with analogous shapes:
+Create collection files matching the web `BlogPost` and `Testimonial` types:
 
 ```ts
-// Posts.ts core fields
-{ name: 'title', type: 'text', required: true }
-{ name: 'slug', type: 'text', required: true, unique: true }
-{ name: 'excerpt', type: 'textarea' }
-{ name: 'publishedAt', type: 'date' }
-{ name: 'coverImage', type: 'upload', relationTo: 'media' }
-{ name: 'body', type: 'richText', required: true }
+// Posts.ts — matches apps/web/src/data/blog.ts BlogPost
+export const Posts: CollectionConfig = {
+  slug: 'posts',
+  admin: { useAsTitle: 'title' },
+  access: { read: () => true },
+  fields: [
+    { name: 'slug', type: 'text', required: true, unique: true },
+    { name: 'category', type: 'text', required: true },
+    { name: 'title', type: 'text', required: true },
+    { name: 'image', type: 'text', required: true },
+    { name: 'date', type: 'text', required: true },
+    { name: 'author', type: 'text', required: true },
+    { name: 'excerpt', type: 'textarea', required: true },
+    { name: 'body', type: 'richText' },
+  ],
+  hooks: { afterChange: [triggerRevalidation] },
+}
 ```
 
 ```ts
-// Testimonials.ts core fields
-{ name: 'name', type: 'text', required: true }
-{ name: 'title', type: 'text' }
-{ name: 'rating', type: 'number' }
-{ name: 'text', type: 'textarea', required: true }
+// Testimonials.ts — matches apps/web/src/data/testimonials.ts Testimonial
+export const Testimonials: CollectionConfig = {
+  slug: 'testimonials',
+  admin: { useAsTitle: 'name' },
+  access: { read: () => true },
+  fields: [
+    { name: 'rating', type: 'number', required: true },
+    { name: 'name', type: 'text', required: true },
+    { name: 'title', type: 'text', required: true },
+    { name: 'text', type: 'textarea', required: true },
+  ],
+  hooks: { afterChange: [triggerRevalidation] },
+}
 ```
 
 ```ts
-// ContactSubmissions.ts core fields
-{ name: 'name', type: 'text', required: true }
-{ name: 'email', type: 'email', required: true }
-{ name: 'message', type: 'textarea', required: true }
+// ContactSubmissions.ts — admin-only write, public read off
+export const ContactSubmissions: CollectionConfig = {
+  slug: 'contact-submissions',
+  access: {
+    read: ({ req: { user } }) => Boolean(user),
+    create: () => true,
+  },
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'email', type: 'email', required: true },
+    { name: 'message', type: 'textarea', required: true },
+  ],
+}
 ```
 
-Attach `triggerRevalidation` only to collections that affect rendered site pages.
+Attach `triggerRevalidation` only to collections that affect rendered site pages (`tour-packages`, `posts`, `testimonials`). `contact-submissions` does not get the hook.
 
 - [ ] **Step 4: Register the collections in `payload.config.ts`**
 
@@ -335,37 +383,77 @@ git commit -m "feat: define cms collections"
 
 - [ ] **Step 1: Create mapper helpers**
 
-Create `apps/cms/src/lib/content-mappers.ts` with explicit transformations:
+Create `apps/cms/src/lib/content-mappers.ts`. These map repo JSON (`apps/web/src/content/**`, shape verified against `singapore.json` / `turkey-guide.json` / testimonials) to the Payload collection input shapes. Array fields are stored as Payload `array` rows, so wrap each item in the row's field name:
 
 ```ts
+import type { RichText } from '@payloadcms/richtext-lexical/types'
+
 export function mapTour(doc: any) {
   return {
-    title: doc.title,
     slug: doc.slug,
-    summary: doc.summary ?? doc.description ?? '',
-    price: doc.price ?? '',
-    duration: doc.duration ?? '',
-    location: doc.location ?? '',
-    content: doc.content ?? doc.itinerary ?? [],
+    title: doc.title,
+    location: doc.location,
+    image: doc.image,
+    duration: doc.duration,
+    gallery: (doc.gallery ?? []).map((src: string) => ({ src })),
+    excerpt: doc.excerpt,
+    tag: doc.tag,
+    intro: toLexical(doc.intro),
+    pricing: (doc.pricing ?? []).map((row: any) => ({ label: row.label, value: row.value })),
+    validUntil: doc.validUntil,
+    included: (doc.included ?? []).map((item: string) => ({ item })),
+    highlights: (doc.highlights ?? []).map((item: string) => ({ item })),
+    requirements: (doc.requirements ?? []).map((item: string) => ({ item })),
+    itinerary: (doc.itinerary ?? []).map((row: any) => ({ day: row.day, description: row.description })),
+    hashtags: (doc.hashtags ?? []).map((item: string) => ({ item })),
   }
 }
 
 export function mapPost(doc: any) {
   return {
-    title: doc.title,
     slug: doc.slug,
-    excerpt: doc.excerpt ?? '',
-    publishedAt: doc.date ?? null,
-    body: doc.body,
+    category: doc.category,
+    title: doc.title,
+    image: doc.image,
+    date: doc.date,
+    author: doc.author,
+    excerpt: doc.excerpt,
+    body: toLexical(doc.body),
   }
 }
 
 export function mapTestimonial(doc: any) {
   return {
-    name: doc.name,
-    title: doc.title ?? '',
     rating: Number(doc.rating ?? 5),
+    name: doc.name,
+    title: doc.title,
     text: doc.text,
+  }
+}
+
+function paragraph(text: string) {
+  return {
+    type: 'paragraph' as const,
+    children: [{ type: 'text' as const, text, format: 0, detail: 0, mode: 'normal' as const, style: '', version: 1 }],
+    direction: 'ltr' as const,
+    format: '',
+    indent: 0,
+    version: 1,
+  }
+}
+
+export function toLexical(text?: string | null): RichText | null {
+  if (!text) return null
+  const paragraphs = text.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean)
+  return {
+    root: {
+      type: 'root' as const,
+      children: paragraphs.map(paragraph),
+      direction: 'ltr' as const,
+      format: '',
+      indent: 0,
+      version: 1,
+    },
   }
 }
 ```
@@ -417,13 +505,17 @@ Update `apps/cms/package.json` scripts:
 "seed:repo-json": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-from-repo-json.ts"
 ```
 
-- [ ] **Step 4: Smoke test the script locally**
+- [ ] **Step 4: Typecheck the script (do NOT run it yet)**
 
-Run: `pnpm run seed:repo-json`
+The seed script needs a live CMS (staging), which is created in **Task 7**. For now, only verify it compiles:
+
+Run: `npx tsc --noEmit scripts/seed-from-repo-json.ts src/lib/content-mappers.ts`
 
 Workdir: `apps/cms`
 
-Expected: either successful creates against staging or clear schema-mapping failures that you fix before proceeding.
+Expected: no type errors (array field shapes line up with the mapped output).
+
+Actual seeding against staging happens in Task 7 Step 4, once staging resources exist.
 
 - [ ] **Step 5: Commit**
 
@@ -439,9 +531,11 @@ git commit -m "feat: add cms seed pipeline"
 **Files:**
 - Modify: `apps/web/open-next.config.ts`
 - Modify: `apps/web/wrangler.jsonc`
-- Create: `apps/web/app/api/revalidate/route.ts`
+- Verify (already committed, keep as-is): `apps/web/src/app/api/revalidate/route.ts`
 
-- [ ] **Step 1: Add tag cache to `open-next.config.ts`**
+> **Time-based ISR requires the revalidation Queue** (verified against OpenNext docs): the `doQueue` / `NEXT_CACHE_DO_QUEUE` binding and a `DOQueueHandler` migration must be added in addition to the tag cache. DO migrations must use `new_sqlite_classes` (not `new_classes`).
+
+- [ ] **Step 1: Add tag cache + queue to `open-next.config.ts`**
 
 Set `apps/web/open-next.config.ts` to:
 
@@ -449,55 +543,46 @@ Set `apps/web/open-next.config.ts` to:
 import { defineCloudflareConfig } from '@opennextjs/cloudflare'
 import r2IncrementalCache from '@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache'
 import doShardedTagCache from '@opennextjs/cloudflare/overrides/tag-cache/do-sharded-tag-cache'
+import doQueue from '@opennextjs/cloudflare/overrides/queue/do-queue'
 
 export default defineCloudflareConfig({
   incrementalCache: r2IncrementalCache,
   tagCache: doShardedTagCache({ baseShardSize: 12 }),
+  queue: doQueue,
 })
 ```
 
-- [ ] **Step 2: Add the Durable Object binding and migration**
+- [ ] **Step 2: Add the Durable Object bindings and migrations**
 
-Add to `apps/web/wrangler.jsonc`:
+Add to `apps/web/wrangler.jsonc` (matches the official OpenNext "large site using revalidation" config — the DO queue is a Durable Object, **not** a Cloudflare `queues` binding):
 
 ```jsonc
 "durable_objects": {
   "bindings": [
     {
+      "name": "NEXT_CACHE_DO_QUEUE",
+      "class_name": "DOQueueHandler",
+    },
+    {
       "name": "NEXT_TAG_CACHE_DO_SHARDED",
-      "class_name": "DOShardedTagCache"
-    }
-  ]
+      "class_name": "DOShardedTagCache",
+    },
+  ],
 },
 "migrations": [
   {
-    "tag": "v1_add_do_sharded_tag_cache",
-    "new_classes": ["DOShardedTagCache"]
-  }
-]
+    "tag": "v1",
+    "new_sqlite_classes": [
+      "DOQueueHandler",
+      "DOShardedTagCache",
+    ],
+  },
+],
 ```
 
-- [ ] **Step 3: Add the revalidation route**
+- [ ] **Step 3: Verify the existing revalidation route (keep it, do not overwrite)**
 
-Create `apps/web/app/api/revalidate/route.ts`:
-
-```ts
-import { revalidateTag } from 'next/cache'
-import { NextRequest, NextResponse } from 'next/server'
-
-export async function POST(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get('secret')
-
-  if (secret !== process.env.REVALIDATE_SECRET) {
-    return NextResponse.json({ message: 'Invalid secret' }, { status: 401 })
-  }
-
-  const { tag } = await req.json()
-  revalidateTag(tag)
-
-  return NextResponse.json({ revalidated: true, tag })
-}
-```
+`apps/web/src/app/api/revalidate/route.ts` already exists (committed in the scaffold). It uses `revalidateTag(tag, 'max')` (Next 16 recommended form) and returns 400 when `tag` is missing. Leave it as-is; just confirm the file is present and uses the `secret` query-param + `tag` body contract that the Payload `triggerRevalidation` hook will call.
 
 - [ ] **Step 4: Verify the web app still builds**
 
@@ -505,12 +590,12 @@ Run: `pnpm run build`
 
 Workdir: `apps/web`
 
-Expected: OpenNext config and wrangler config are accepted with the new tag cache pieces.
+Expected: OpenNext config and wrangler config are accepted with the new tag cache + queue pieces.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/web/open-next.config.ts apps/web/wrangler.jsonc apps/web/app/api/revalidate/route.ts
+git add apps/web/open-next.config.ts apps/web/wrangler.jsonc
 git commit -m "feat: add web revalidation infrastructure"
 ```
 
@@ -521,44 +606,134 @@ git commit -m "feat: add web revalidation infrastructure"
 **Files:**
 - Modify: `apps/web/src/lib/cms.ts`
 
-- [ ] **Step 1: Replace local tours read with a tagged REST fetch**
+> The Payload REST API returns array fields as rows (`gallery: [{ src }]`, `included: [{ item }]`, `pricing: [{ label, value }]`) and richText fields already in Lexical form, and it paginates at 10 docs/page by default — so the fetch needs a `limit` param and the mappers must unwrap rows and pass richText through.
 
-Replace the existing implementation with:
+- [ ] **Step 1: Replace local reads with tagged REST fetches + mappers**
+
+Replace `apps/web/src/lib/cms.ts` with:
 
 ```ts
+import type { Package, PricingRow, ItineraryDay } from '@/data/packages'
+import type { BlogPost } from '@/data/blog'
+import type { Testimonial } from '@/data/testimonials'
+
 const PAYLOAD_URL = process.env.PAYLOAD_URL!
 
-export async function getTourPackages(): Promise<Package[]> {
-  const res = await fetch(`${PAYLOAD_URL}/api/tour-packages`, {
-    next: { revalidate: 3600, tags: ['tours'] },
-  })
+interface ApiTour {
+  slug: string
+  title: string
+  location: string
+  image: string
+  duration: string
+  gallery?: Array<{ src: string }>
+  excerpt: string
+  tag: string
+  intro?: unknown
+  pricing?: PricingRow[]
+  validUntil?: string
+  included?: Array<{ item: string }>
+  highlights?: Array<{ item: string }>
+  requirements?: Array<{ item: string }>
+  itinerary?: ItineraryDay[]
+  hashtags?: Array<{ item: string }>
+}
 
+interface ApiPost {
+  slug: string
+  category: string
+  title: string
+  image: string
+  date: string
+  author: string
+  excerpt: string
+  body?: unknown
+}
+
+function mapPackage(doc: ApiTour): Package {
+  return {
+    slug: doc.slug,
+    title: doc.title,
+    location: doc.location,
+    image: doc.image,
+    duration: doc.duration,
+    gallery: (doc.gallery ?? []).map((row) => row.src),
+    excerpt: doc.excerpt,
+    tag: doc.tag,
+    content: {
+      intro: doc.intro ?? null,
+      included: (doc.included ?? []).map((row) => row.item),
+      highlights: (doc.highlights ?? []).map((row) => row.item),
+      pricing: doc.pricing ?? [],
+      itinerary: doc.itinerary ?? [],
+      requirements: (doc.requirements ?? []).map((row) => row.item),
+      hashtags: (doc.hashtags ?? []).map((row) => row.item),
+      validUntil: doc.validUntil,
+    },
+  }
+}
+
+function mapPost(doc: ApiPost): BlogPost {
+  return {
+    slug: doc.slug,
+    category: doc.category,
+    title: doc.title,
+    image: doc.image,
+    date: doc.date,
+    author: doc.author,
+    excerpt: doc.excerpt,
+    body: doc.body ?? null,
+  }
+}
+
+function mapTestimonial(doc: Testimonial): Testimonial {
+  return {
+    rating: Number(doc.rating ?? 5),
+    name: doc.name,
+    title: doc.title,
+    text: doc.text,
+  }
+}
+
+async function fetchDocs<T>(collection: string): Promise<T[]> {
+  const res = await fetch(`${PAYLOAD_URL}/api/${collection}?limit=1000`, {
+    next: { revalidate: 3600 },
+  })
+  if (!res.ok) throw new Error(`CMS fetch failed for ${collection}: ${res.status}`)
   const data = await res.json()
-  return data.docs.map(mapPackage)
+  return data.docs as T[]
 }
 ```
 
-- [ ] **Step 2: Replace blog and testimonials reads the same way**
-
-Use the same pattern:
+- [ ] **Step 2: Tagged getters**
 
 ```ts
+export async function getTourPackages(): Promise<Package[]> {
+  const docs = await fetchDocs<ApiTour>('tour-packages')
+  return docs.map(mapPackage)
+}
+
+export async function getTourPackage(slug: string): Promise<Package | undefined> {
+  const all = await getTourPackages()
+  return all.find((p) => p.slug === slug)
+}
+
 export async function getPosts(): Promise<BlogPost[]> {
-  const res = await fetch(`${PAYLOAD_URL}/api/posts`, {
-    next: { revalidate: 3600, tags: ['posts'] },
-  })
-  const data = await res.json()
-  return data.docs.map(mapPost).sort((a: BlogPost, b: BlogPost) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  const docs = await fetchDocs<ApiPost>('posts')
+  return docs.map(mapPost).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
+
+export async function getPost(slug: string): Promise<BlogPost | undefined> {
+  const all = await getPosts()
+  return all.find((p) => p.slug === slug)
 }
 
 export async function getTestimonials(): Promise<Testimonial[]> {
-  const res = await fetch(`${PAYLOAD_URL}/api/testimonials`, {
-    next: { revalidate: 3600, tags: ['testimonials'] },
-  })
-  const data = await res.json()
-  return data.docs.map(mapTestimonial)
+  const docs = await fetchDocs<Testimonial>('testimonials')
+  return docs.map(mapTestimonial)
 }
 ```
+
+Revalidation tags (`tours`, `posts`, `testimonials`) are set centrally in the `triggerRevalidation` hook mapping, not per-fetch, so `fetchDocs` stays tag-agnostic.
 
 - [ ] **Step 3: Keep runtime env usage server-side only**
 
@@ -570,7 +745,7 @@ Run: `pnpm run build`
 
 Workdir: `apps/web`
 
-Expected: no broken imports from removed `readJsonDirectory` call sites.
+Expected: no broken imports from removed `readJsonDirectory` call sites (`cms.ts` is the only consumer; callers are `src/app/{page,tours/*,blog/*,sitemap}.tsx`).
 
 - [ ] **Step 5: Commit**
 
