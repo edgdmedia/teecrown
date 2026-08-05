@@ -18,7 +18,7 @@
   "d1_databases": [
     {
       "binding": "D1",
-      "database_id": "REPLACE_PROD_D1_ID",
+      "database_id": "5b450f6f-17b5-4ebd-b2ec-47e522e0d333",
       "database_name": "teecrownconsult-cms",
       "remote": true,
     },
