@@ -16,5 +16,6 @@ export const Media: CollectionConfig = {
     // These are not supported on Workers yet due to lack of sharp
     crop: false,
     focalPoint: false,
+    skipSafeFetch: true,
   },
 }
