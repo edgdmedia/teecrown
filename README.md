@@ -144,6 +144,8 @@ After the admin Worker is deployed, add a custom domain in Cloudflare:
 - Worker: `teecrownconsult-admin`
 - Route/domain: `dash.teecrownconsult.org`
 
+The admin UI is mounted directly at `/` on that subdomain, while the Keystatic API remains under `/api/keystatic/*`.
+
 ### Architecture after deploy
 
 ```text
