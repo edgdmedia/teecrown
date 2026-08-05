@@ -84,6 +84,8 @@ npx wrangler secret put KEYSTATIC_SECRET
 
 Paste the matching values when prompted.
 
+Important: GitHub Actions secrets are only available during CI. Keystatic reads these values at Worker runtime, so they must also exist as Cloudflare Worker secrets on `teecrownconsult-admin`.
+
 ## Content Source
 
 Public editable content now lives under `apps/web/src/content/`:
