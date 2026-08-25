@@ -1,5 +1,4 @@
 import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -22,13 +21,10 @@ export default async function HomePage() {
   return (
     <div className="home">
       <div className="brand-lockup">
-        <Image
+        <img
           src="/logo-landscape.webp"
           alt="Tee'Crown Consult"
-          width={220}
-          height={56}
           className="brand-mark"
-          priority
         />
         <div className="brand-copy">Travel content operations dashboard</div>
       </div>

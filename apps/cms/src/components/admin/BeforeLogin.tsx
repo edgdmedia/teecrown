@@ -12,13 +12,10 @@ export default function BeforeLogin() {
         marginBottom: '20px',
       }}
     >
-      <Image
+      <img
         src="/logo-landscape.webp"
         alt="Tee'Crown Consult"
-        width={220}
-        height={56}
         style={{ height: 'auto', width: '220px' }}
-        priority
       />
       <p style={{ color: 'var(--theme-elevation-600)', margin: 0, maxWidth: '32rem' }}>
         Sign in to manage tours, stories, testimonials and media for Tee&apos;Crown Consult.
