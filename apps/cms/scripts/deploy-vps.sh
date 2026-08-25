@@ -6,7 +6,6 @@ CURRENT_DIR="$APP_ROOT/current"
 SHARED_DIR="$APP_ROOT/shared"
 MEDIA_DIR="$SHARED_DIR/media"
 ENV_FILE="$SHARED_DIR/.env.production"
-REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "Missing env file: $ENV_FILE"
@@ -21,10 +20,7 @@ fi
 
 mkdir -p "$APP_ROOT" "$SHARED_DIR" "$MEDIA_DIR"
 
-cd "$REPO_ROOT"
-pnpm install --frozen-lockfile
-
-cd "$REPO_ROOT/apps/cms"
+pnpm install --no-frozen-lockfile
 pnpm run generate:importmap
 pnpm run generate:types
 pnpm run build
