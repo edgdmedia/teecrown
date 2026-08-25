@@ -2,8 +2,11 @@ import React from 'react'
 import './styles.css'
 
 export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+  description: 'Content management system for teecrownconsult.org.',
+  icons: {
+    icon: '/favicon.ico',
+  },
+  title: "Tee'Crown Consult | Content Management",
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
