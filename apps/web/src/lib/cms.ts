@@ -8,6 +8,13 @@ interface ApiMedia {
   url?: string | null
 }
 
+function absoluteCMSURL(url?: string | null) {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (url.startsWith('/')) return `${PAYLOAD_URL}${url}`
+  return `${PAYLOAD_URL}/${url}`
+}
+
 interface LexicalDocument {
   root: {
     type: string
@@ -50,13 +57,13 @@ interface ApiPost {
 }
 
 function mapPackage(doc: ApiTour): Package {
-  const gallery = (doc.galleryMedia ?? []).map((row) => row.image?.url).filter(Boolean) as string[]
+  const gallery = (doc.galleryMedia ?? []).map((row) => absoluteCMSURL(row.image?.url)).filter(Boolean)
 
   return {
     slug: doc.slug,
     title: doc.title,
     location: doc.location,
-    image: doc.imageMedia?.url || '',
+    image: absoluteCMSURL(doc.imageMedia?.url),
     duration: doc.duration,
     gallery,
     excerpt: doc.excerpt,
@@ -79,7 +86,7 @@ function mapPost(doc: ApiPost): BlogPost {
     slug: doc.slug,
     category: doc.category,
     title: doc.title,
-    image: doc.imageMedia?.url || '',
+    image: absoluteCMSURL(doc.imageMedia?.url),
     date: doc.date,
     author: doc.author,
     excerpt: doc.excerpt,
