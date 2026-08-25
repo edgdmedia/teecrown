@@ -54,7 +54,7 @@ async function main() {
 
     await payload.create({
       collection,
-      data: doc,
+      data: doc as never,
     })
 
     created++
