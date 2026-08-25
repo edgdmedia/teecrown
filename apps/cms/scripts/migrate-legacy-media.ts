@@ -1,7 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import mime from 'mime/lite'
 import { getPayload } from 'payload'
 
 import config from '../src/payload.config.js'
@@ -49,6 +48,14 @@ function altFromFilename(name: string) {
     .trim()
 }
 
+function mimeTypeFromFilename(name: string) {
+  if (name.endsWith('.png')) return 'image/png'
+  if (name.endsWith('.jpg') || name.endsWith('.jpeg')) return 'image/jpeg'
+  if (name.endsWith('.webp')) return 'image/webp'
+  if (name.endsWith('.avif')) return 'image/avif'
+  return 'application/octet-stream'
+}
+
 async function ensureMedia(payload: Awaited<ReturnType<typeof getPayload>>, legacyPath: string) {
   const fileName = fileNameFromLegacyPath(legacyPath)
   const existing = await payload.find({
@@ -75,7 +82,7 @@ async function ensureMedia(payload: Awaited<ReturnType<typeof getPayload>>, lega
     },
     file: {
       data: buffer,
-      mimetype: mime.getType(fileName) || 'application/octet-stream',
+      mimetype: mimeTypeFromFilename(fileName.toLowerCase()),
       name: fileName,
       size: buffer.byteLength,
     },
