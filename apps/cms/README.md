@@ -20,6 +20,7 @@ SMTP_HOST=mail.example.com
 SMTP_PORT=587
 SMTP_USER=noreply@example.com
 SMTP_PASS=replace-with-smtp-password
+SMTP_TLS_REJECT_UNAUTHORIZED=true
 FROM_EMAIL=noreply@example.com
 EMAIL_FROM_NAME=Your Company Name
 ```
@@ -37,8 +38,9 @@ SMTP_HOST=mail.teecrownconsult.org
 SMTP_PORT=587
 SMTP_USER=noreply@teecrownconsult.org
 SMTP_PASS=...
+SMTP_TLS_REJECT_UNAUTHORIZED=false
 FROM_EMAIL=noreply@teecrownconsult.org
-EMAIL_FROM_NAME=Tee'Crown Consult
+EMAIL_FROM_NAME=TeeCrown Consult
 ```
 
 ## Local development

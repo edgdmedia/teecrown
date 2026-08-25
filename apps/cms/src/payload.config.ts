@@ -45,6 +45,9 @@ export default buildConfig({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT || 587),
       secure: Number(process.env.SMTP_PORT || 587) === 465,
+      tls: {
+        rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== 'false',
+      },
     },
   }),
   secret: process.env.PAYLOAD_SECRET || '',
