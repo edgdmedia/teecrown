@@ -16,9 +16,30 @@ PAYLOAD_SECRET=replace-with-a-long-random-string
 FRONTEND_REVALIDATE_URL=https://teecrownconsult.org/api/revalidate
 REVALIDATE_SECRET=shared-secret-with-apps-web
 PAYLOAD_URL=https://cms.your-domain.com
+SMTP_HOST=mail.example.com
+SMTP_PORT=587
+SMTP_USER=noreply@example.com
+SMTP_PASS=replace-with-smtp-password
+FROM_EMAIL=noreply@example.com
+EMAIL_FROM_NAME=Your Company Name
 ```
 
 `PAYLOAD_URL` is used by the seed script and should point to the running CMS URL.
+
+## Email
+
+Payload is configured to send email through SMTP using `@payloadcms/email-nodemailer`.
+
+For Tee'Crown Consult, configure these in `/home/teecrownconsult/apps/cms/shared/.env.production`:
+
+```bash
+SMTP_HOST=mail.teecrownconsult.org
+SMTP_PORT=587
+SMTP_USER=noreply@teecrownconsult.org
+SMTP_PASS=...
+FROM_EMAIL=noreply@teecrownconsult.org
+EMAIL_FROM_NAME=Tee'Crown Consult
+```
 
 ## Local development
 

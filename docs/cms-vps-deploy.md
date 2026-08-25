@@ -33,6 +33,17 @@ Create:
 
 Use `apps/cms/.env.production.example` as the template.
 
+Required SMTP variables for email delivery:
+
+```bash
+SMTP_HOST=mail.teecrownconsult.org
+SMTP_PORT=587
+SMTP_USER=noreply@teecrownconsult.org
+SMTP_PASS=...
+FROM_EMAIL=noreply@teecrownconsult.org
+EMAIL_FROM_NAME=Tee'Crown Consult
+```
+
 ## Deploy flow on the VPS
 
 From the CMS checkout on the server:
