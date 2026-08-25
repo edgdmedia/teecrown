@@ -23,7 +23,7 @@ export default buildConfig({
       beforeLogin: ['@/components/admin/BeforeLogin'],
       graphics: {
         Icon: '@/components/admin/Icon',
-        Logo: '@/components/admin/Logo',
+        Logo: '@/components/admin/Icon',
       },
     },
     user: Users.slug,
