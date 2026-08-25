@@ -32,15 +32,12 @@ cp -R .next/static .next/standalone/.next/
 rm -rf "$CURRENT_DIR"
 mkdir -p "$CURRENT_DIR"
 
-cp -R .next "$CURRENT_DIR/"
-cp -R public "$CURRENT_DIR/"
-cp -R src "$CURRENT_DIR/"
+cp -R .next/standalone/. "$CURRENT_DIR/"
 cp package.json "$CURRENT_DIR/"
 cp ecosystem.config.cjs "$CURRENT_DIR/"
-cp -R node_modules "$CURRENT_DIR/"
 
-rm -rf "$CURRENT_DIR/.next/standalone/media"
-ln -s "$MEDIA_DIR" "$CURRENT_DIR/.next/standalone/media"
+rm -rf "$CURRENT_DIR/media"
+ln -s "$MEDIA_DIR" "$CURRENT_DIR/media"
 
 set -a
 . "$ENV_FILE"

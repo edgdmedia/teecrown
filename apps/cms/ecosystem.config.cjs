@@ -4,7 +4,7 @@ module.exports = {
       name: 'teecrownconsult-cms',
       cwd: '/home/teecrownconsult/apps/cms/current',
       script: 'node',
-      args: '.next/standalone/server.js',
+      args: 'server.js',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
