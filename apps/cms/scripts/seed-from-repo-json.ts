@@ -12,15 +12,17 @@ type SeedDoc = {
   slug?: string
 }
 
+type SeedCollection = 'posts' | 'testimonials' | 'tour-packages'
+
 async function readDir(slug: string) {
   const dir = path.join(CONTENT_ROOT, slug)
   const files = (await fs.readdir(dir)).filter((f) => f.endsWith('.json')).sort()
   return Promise.all(files.map((f) => fs.readFile(path.join(dir, f), 'utf8').then(JSON.parse)))
 }
 
-async function exists(payload: Awaited<ReturnType<typeof getPayload>>, collection: string, field: string, value: string) {
+async function exists(payload: Awaited<ReturnType<typeof getPayload>>, collection: SeedCollection, field: string, value: string) {
   const result = await payload.find({
-    collection: collection as 'posts' | 'testimonials' | 'tour-packages',
+    collection,
     limit: 1,
     pagination: false,
     where: {
@@ -40,10 +42,10 @@ async function main() {
   let skipped = 0
 
   const upsert = async (
-    collection: 'posts' | 'testimonials' | 'tour-packages',
+    collection: SeedCollection,
     field: string,
     value: string,
-    doc: SeedDoc,
+    doc: Record<string, unknown>,
   ) => {
     if (await exists(payload, collection, field, value)) {
       skipped++
