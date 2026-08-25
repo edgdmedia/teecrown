@@ -1,9 +1,13 @@
 import type { CollectionConfig } from 'payload'
+import { adminsAndEditors, adminsOnly } from '../lib/access'
 
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
     read: () => true,
+    create: adminsAndEditors,
+    update: adminsAndEditors,
+    delete: adminsOnly,
   },
   fields: [
     {
@@ -13,9 +17,7 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    // These are not supported on Workers yet due to lack of sharp
-    crop: false,
-    focalPoint: false,
-    skipSafeFetch: true,
+    staticDir: 'media',
+    mimeTypes: ['image/*'],
   },
 }

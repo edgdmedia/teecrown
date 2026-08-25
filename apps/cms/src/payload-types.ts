@@ -131,6 +131,7 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -166,6 +167,8 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -176,7 +179,11 @@ export interface Post {
   slug: string;
   category: string;
   title: string;
+  /**
+   * Legacy image path kept for existing content.
+   */
   image: string;
+  imageMedia?: (number | null) | Media;
   date: string;
   author: string;
   excerpt: string;
@@ -207,11 +214,24 @@ export interface TourPackage {
   title: string;
   slug: string;
   location: string;
+  /**
+   * Legacy image path kept for existing content.
+   */
   image: string;
+  imageMedia?: (number | null) | Media;
   duration: string;
+  /**
+   * Legacy gallery paths kept for existing content.
+   */
   gallery?:
     | {
         src: string;
+        id?: string | null;
+      }[]
+    | null;
+  galleryMedia?:
+    | {
+        image: number | Media;
         id?: string | null;
       }[]
     | null;
@@ -394,6 +414,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -426,6 +447,8 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -436,6 +459,7 @@ export interface PostsSelect<T extends boolean = true> {
   category?: T;
   title?: T;
   image?: T;
+  imageMedia?: T;
   date?: T;
   author?: T;
   excerpt?: T;
@@ -452,11 +476,18 @@ export interface TourPackagesSelect<T extends boolean = true> {
   slug?: T;
   location?: T;
   image?: T;
+  imageMedia?: T;
   duration?: T;
   gallery?:
     | T
     | {
         src?: T;
+        id?: T;
+      };
+  galleryMedia?:
+    | T
+    | {
+        image?: T;
         id?: T;
       };
   excerpt?: T;

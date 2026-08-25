@@ -37,10 +37,15 @@ async function exists(collection: string, field: string, value: string) {
   return data.docs.length > 0
 }
 
+type SeedDoc = {
+  name?: string
+  slug?: string
+}
+
 let created = 0
 let skipped = 0
 
-async function upsert(collection: string, field: string, value: string, doc: any) {
+async function upsert(collection: string, field: string, value: string, doc: SeedDoc) {
   if (await exists(collection, field, value)) {
     skipped++
     return

@@ -1,112 +1,93 @@
-# TeeCrown Consult CMS (Payload on Cloudflare)
+# TeeCrown Consult CMS
 
-Payload CMS backend for the TeeCrown Consult site (`apps/web`), deployed on Cloudflare Workers with a D1 database and R2 media storage.
+Payload CMS backend for the TeeCrown Consult site (`apps/web`), intended for self-hosting on a VPS with Postgres and local media storage.
 
-**This can only be deployed on Paid Workers right now due to size limits.**
+## Runtime
+
+- Node.js `24.15.0`
+- Postgres
+- Local filesystem storage for media uploads
+
+## Required environment variables
+
+```bash
+DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DB_NAME
+PAYLOAD_SECRET=replace-with-a-long-random-string
+FRONTEND_REVALIDATE_URL=https://teecrownconsult.org/api/revalidate
+REVALIDATE_SECRET=shared-secret-with-apps-web
+PAYLOAD_URL=https://cms.your-domain.com
+```
+
+`PAYLOAD_URL` is used by the seed script and should point to the running CMS URL.
 
 ## Local development
 
-Requires Node >= 24.15 (e.g. `nvm use 24.15.0`).
+Requires Node `24.15.0`.
 
 ```bash
 pnpm install
+pnpm run generate:importmap
+pnpm run generate:types
+pnpm payload migrate:create
 pnpm dev
 ```
 
-This starts Next/Payload locally; Wrangler creates local D1/R2 bindings automatically. See `AGENTS.md` for the full local test loop against `apps/web`.
-
-Out of the box, using [`Wrangler`](https://developers.cloudflare.com/workers/wrangler/) will automatically create local bindings for you to connect to the remote services and it can even create a local mock of the services you're using with Cloudflare.
-
-We've pre-configured Payload for you with the following:
-
-### Collections
-
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
-
-- #### Users (Authentication)
-
-  Users are auth-enabled collections that have access to the admin panel.
-
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
-
-- #### Media
-
-  This is the uploads enabled collection.
-
-### Image Storage (R2)
-
-Images will be served from an R2 bucket which you can then further configure to use a CDN to serve for your frontend directly.
-
-### D1 Database
-
-The Worker will have direct access to a D1 SQLite database which Wrangler can connect locally to, just note that you won't have a connection string as you would typically with other providers.
-
-You can enable read replicas by adding `readReplicas: 'first-primary'` in the DB adapter and then enabling it on your D1 Cloudflare dashboard. Read more about this feature on [our docs](https://payloadcms.com/docs/database/sqlite#d1-read-replicas).
-
-## Working with Cloudflare
-
-Firstly, after installing dependencies locally you need to authenticate with Wrangler by running:
+In another terminal, run the web app against the local CMS:
 
 ```bash
-pnpm wrangler login
+cd ../web
+PAYLOAD_URL=http://localhost:3000 npm run dev
 ```
 
-This will take you to Cloudflare to login and then you can use the Wrangler CLI locally for anything, use `pnpm wrangler help` to see all available options.
+## Database workflow
 
-Wrangler is pretty smart so it will automatically bind your services for local development just by running `pnpm dev`.
-
-## Deployments
-
-When you're ready to deploy, first make sure you have created your migrations:
+Create a migration after schema changes:
 
 ```bash
 pnpm payload migrate:create
 ```
 
-Then run the following command:
+Apply migrations:
 
 ```bash
-pnpm run deploy
+pnpm run deploy:database
 ```
 
-This will spin up Wrangler in `production` mode, run any created migrations, build the app and then deploy the bundle up to Cloudflare.
+## Production build
 
-That's it! You can if you wish move these steps into your CI pipeline as well.
+Build the standalone server bundle:
 
-## Enabling logs
+```bash
+pnpm run build
+```
 
-By default logs are not enabled for your API, we've made this decision because it does run against your quota so we've left it opt-in. But you can easily enable logs in one click in the Cloudflare panel, [see docs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs).
+Start the production server:
 
-### Logger Configuration
+```bash
+pnpm start
+```
 
-This template includes a custom console-based logger compatible with Cloudflare Workers. Payload's default logger uses `pino-pretty`, which relies on Node.js APIs not available in Workers and would cause `fs.write is not implemented` errors.
+When deploying the standalone output, copy static assets alongside the standalone server:
 
-The custom logger in `payload.config.ts`:
+```bash
+cp -r public .next/standalone/
+cp -r .next/static .next/standalone/.next/
+mkdir -p .next/standalone/media
+```
 
-- Routes logs through `console.*` methods which Workers handles correctly
-- Outputs JSON-formatted logs for Cloudflare observability
-- Only active in production (development uses the default `pino-pretty` for better DX)
+The `media` directory must be persistent on disk in production or uploaded files will be lost on redeploy/restart.
 
-You can control the log level via the `PAYLOAD_LOG_LEVEL` environment variable (e.g., `debug`, `info`, `warn`, `error`).
+## Media storage
 
-### Diagnostic Channel Errors
+Uploads are stored locally under `media/` via the `media` collection's `staticDir` setting.
 
-If you see "Failed to publish diagnostic channel message" errors in your observability logs, these typically come from the `undici` HTTP client library. The template includes `skipSafeFetch: true` in the Media collection to use native fetch instead of undici for file uploads, which helps reduce these errors.
+If you later want object storage, replace local media storage with an S3-compatible adapter without changing the frontend integration.
 
-Cloudflare Workers runs in an [isolated environment that cannot access private IP ranges](https://developers.cloudflare.com/workers-vpc/examples/route-across-private-services/) by default, providing built-in SSRF protection. This makes `skipSafeFetch` safe to use.
+## Revalidation
 
-## Known issues
+CMS collection updates trigger POST requests to the web app's `/api/revalidate` endpoint using:
 
-### GraphQL
+- `FRONTEND_REVALIDATE_URL`
+- `REVALIDATE_SECRET`
 
-We are currently waiting on some issues with GraphQL to be [fixed upstream in Workers](https://github.com/cloudflare/workerd/issues/5175) so full support for GraphQL is not currently guaranteed when deployed.
-
-### Worker size limits
-
-We currently recommend deploying this template to the Paid Workers plan due to bundle [size limits](https://developers.cloudflare.com/workers/platform/limits/#worker-size) of 3mb. We're actively trying to reduce our bundle footprint over time to better meet this metric.
-
-This also applies to your own code, in the case of importing a lot of libraries you may find yourself limited by the bundle.
-
-## Questions
-
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+This keeps `apps/web` on Cloudflare while the CMS runs elsewhere.
