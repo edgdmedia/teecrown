@@ -179,11 +179,7 @@ export interface Post {
   slug: string;
   category: string;
   title: string;
-  /**
-   * Legacy image path kept for existing content.
-   */
-  image: string;
-  imageMedia?: (number | null) | Media;
+  imageMedia: number | Media;
   date: string;
   author: string;
   excerpt: string;
@@ -214,21 +210,8 @@ export interface TourPackage {
   title: string;
   slug: string;
   location: string;
-  /**
-   * Legacy image path kept for existing content.
-   */
-  image: string;
-  imageMedia?: (number | null) | Media;
+  imageMedia: number | Media;
   duration: string;
-  /**
-   * Legacy gallery paths kept for existing content.
-   */
-  gallery?:
-    | {
-        src: string;
-        id?: string | null;
-      }[]
-    | null;
   galleryMedia?:
     | {
         image: number | Media;
@@ -458,7 +441,6 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   category?: T;
   title?: T;
-  image?: T;
   imageMedia?: T;
   date?: T;
   author?: T;
@@ -475,15 +457,8 @@ export interface TourPackagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   location?: T;
-  image?: T;
   imageMedia?: T;
   duration?: T;
-  gallery?:
-    | T
-    | {
-        src?: T;
-        id?: T;
-      };
   galleryMedia?:
     | T
     | {

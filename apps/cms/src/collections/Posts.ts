@@ -15,11 +15,11 @@ export const Posts: CollectionConfig = {
     { name: 'slug', type: 'text', required: true, unique: true },
     { name: 'category', type: 'text', required: true },
     { name: 'title', type: 'text', required: true },
-    { name: 'image', type: 'text', required: true, admin: { description: 'Legacy image path kept for existing content.' } },
     {
       name: 'imageMedia',
       type: 'upload',
       relationTo: 'media',
+      required: true,
       filterOptions: {
         mimeType: { contains: 'image' },
       },

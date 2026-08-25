@@ -4,6 +4,10 @@ import type { Testimonial } from '@/data/testimonials'
 
 const PAYLOAD_URL = process.env.PAYLOAD_URL!
 
+interface ApiMedia {
+  url?: string | null
+}
+
 interface LexicalDocument {
   root: {
     type: string
@@ -19,9 +23,9 @@ interface ApiTour {
   slug: string
   title: string
   location: string
-  image: string
+  imageMedia: ApiMedia | null
   duration: string
-  gallery?: Array<{ src: string }>
+  galleryMedia?: Array<{ image?: ApiMedia | null }>
   excerpt: string
   tag: string
   intro?: LexicalDocument | null
@@ -38,7 +42,7 @@ interface ApiPost {
   slug: string
   category: string
   title: string
-  image: string
+  imageMedia: ApiMedia | null
   date: string
   author: string
   excerpt: string
@@ -46,13 +50,15 @@ interface ApiPost {
 }
 
 function mapPackage(doc: ApiTour): Package {
+  const gallery = (doc.galleryMedia ?? []).map((row) => row.image?.url).filter(Boolean) as string[]
+
   return {
     slug: doc.slug,
     title: doc.title,
     location: doc.location,
-    image: doc.image,
+    image: doc.imageMedia?.url || '',
     duration: doc.duration,
-    gallery: (doc.gallery ?? []).map((row) => row.src),
+    gallery,
     excerpt: doc.excerpt,
     tag: doc.tag,
     content: {
@@ -73,7 +79,7 @@ function mapPost(doc: ApiPost): BlogPost {
     slug: doc.slug,
     category: doc.category,
     title: doc.title,
-    image: doc.image,
+    image: doc.imageMedia?.url || '',
     date: doc.date,
     author: doc.author,
     excerpt: doc.excerpt,

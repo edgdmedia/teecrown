@@ -15,22 +15,16 @@ export const TourPackages: CollectionConfig = {
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true, unique: true },
     { name: 'location', type: 'text', required: true },
-    { name: 'image', type: 'text', required: true, admin: { description: 'Legacy image path kept for existing content.' } },
     {
       name: 'imageMedia',
       type: 'upload',
       relationTo: 'media',
+      required: true,
       filterOptions: {
         mimeType: { contains: 'image' },
       },
     },
     { name: 'duration', type: 'text', required: true },
-    {
-      name: 'gallery',
-      type: 'array',
-      fields: [{ name: 'src', type: 'text', required: true }],
-      admin: { description: 'Legacy gallery paths kept for existing content.' },
-    },
     {
       name: 'galleryMedia',
       type: 'array',

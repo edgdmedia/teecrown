@@ -22,8 +22,6 @@ type TourDoc = {
   id: number
   slug: string
   title: string
-  image: string
-  gallery?: Array<{ src: string }> | null
   imageMedia?: number | MediaDoc | null
   galleryMedia?: Array<{ image: number | MediaDoc }> | null
 }
@@ -32,7 +30,6 @@ type PostDoc = {
   id: number
   slug: string
   title: string
-  image: string
   imageMedia?: number | MediaDoc | null
 }
 
@@ -119,16 +116,7 @@ async function main() {
   })
 
   for (const post of posts.docs as PostDoc[]) {
-    if (post.imageMedia || !post.image?.startsWith('/images/')) continue
-    const media = await ensureMedia(payload, post.image)
-    await payload.update({
-      id: post.id,
-      collection: 'posts',
-      data: {
-        imageMedia: media.id,
-      },
-    })
-    linked++
+    void post
   }
 
   const tours = await payload.find({
@@ -138,30 +126,7 @@ async function main() {
   })
 
   for (const tour of tours.docs as TourDoc[]) {
-    const data: Record<string, unknown> = {}
-
-    if (!tour.imageMedia && tour.image?.startsWith('/images/')) {
-      const media = await ensureMedia(payload, tour.image)
-      data.imageMedia = media.id
-    }
-
-    const gallery = (tour.gallery ?? []).map((item) => item.src).filter((src) => src.startsWith('/images/'))
-    if (gallery.length && !(tour.galleryMedia && tour.galleryMedia.length)) {
-      data.galleryMedia = []
-      for (const src of gallery) {
-        const media = await ensureMedia(payload, src)
-        ;(data.galleryMedia as Array<{ image: number }>).push({ image: media.id })
-      }
-    }
-
-    if (Object.keys(data).length) {
-      await payload.update({
-        id: tour.id,
-        collection: 'tour-packages',
-        data,
-      })
-      linked++
-    }
+    void tour
   }
 
   console.log(`Media migration complete: ${uploaded} uploaded, ${linked} linked`)
