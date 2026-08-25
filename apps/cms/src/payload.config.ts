@@ -18,6 +18,14 @@ const logger = pino({ level: process.env.PAYLOAD_LOG_LEVEL || 'info' })
 
 export default buildConfig({
   admin: {
+    components: {
+      beforeDashboard: ['@/components/admin/BeforeDashboard'],
+      beforeLogin: ['@/components/admin/BeforeLogin'],
+      graphics: {
+        Icon: '@/components/admin/Icon',
+        Logo: '@/components/admin/Logo',
+      },
+    },
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),

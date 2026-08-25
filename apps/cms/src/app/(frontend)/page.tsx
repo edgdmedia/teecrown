@@ -61,7 +61,7 @@ export default async function HomePage() {
             <a className="login" href={loginRoute}>
               Sign in to Admin
             </a>
-            <a className="site" href="https://teecrownconsult.org">
+            <a className="site" href="https://teecrownconsult.org" rel="noreferrer" target="_blank">
               Visit the public site
             </a>
           </div>
