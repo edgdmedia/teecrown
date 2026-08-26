@@ -7,6 +7,8 @@ on:
       - "deploy-cms-*"
     paths:
       - "apps/cms/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
       - ".github/workflows/deploy-cms.yml"
   workflow_dispatch:
 
@@ -24,13 +26,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24.15.0
+          node-version: 22
           cache: pnpm
-          cache-dependency-path: apps/cms/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: apps/cms
 
       - name: Generate types and importmap
         working-directory: apps/cms
@@ -77,7 +77,7 @@ jobs:
             mv "$CURRENT_DIR" "$CURRENT_DIR.old" 2>/dev/null || true
             mkdir -p "$CURRENT_DIR"
             cp -R "$STAGING_DIR/." "$CURRENT_DIR/"
-            cp "$APP_ROOT/shared/.env.production" "$CURRENT_DIR/" 2>/dev/null || true
+            cp "$SHARED_DIR/.env.production" "$CURRENT_DIR/" 2>/dev/null || true
 
             # Symlink media
             rm -rf "$CURRENT_DIR/media"
