@@ -36,7 +36,7 @@ jobs:
         working-directory: apps/web
         run: pnpm run build:cloudflare
         env:
-          NEXT_PUBLIC_CMS_URL: https://dash.teecrownconsult.org
+          PAYLOAD_URL: https://dash.teecrownconsult.org
 
       - name: Deploy to Cloudflare
         working-directory: apps/web
