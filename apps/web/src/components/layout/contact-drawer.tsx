@@ -13,8 +13,9 @@ interface ContactDrawerProps {
 export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState(false);
   const formRef = useState<HTMLFormElement | null>(null);
-  useEffect(() => { if (open) setSent(false); }, [open]);
+  useEffect(() => { if (open) { setSent(false); setError(false); } }, [open]);
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     if (open) document.addEventListener('keydown', h);
@@ -49,8 +50,9 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
               e.preventDefault();
               const f = new FormData(e.currentTarget);
               setSending(true);
+              setError(false);
               try {
-                await fetch('/api/contact', {
+                const res = await fetch('/api/contact', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -58,8 +60,9 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
                     service: f.get('service'), message: f.get('message'), referral: f.get('referral'),
                   }),
                 });
+                if (!res.ok) throw new Error('Submission failed');
                 setSent(true);
-              } catch { setSent(true); }
+              } catch { setError(true); }
               setSending(false);
             }}>
             <div style={{ marginBottom: '16px' }}>
@@ -113,6 +116,11 @@ export function ContactDrawer({ open, onClose }: ContactDrawerProps) {
                 <option>Other</option>
               </select>
             </div>
+            {error && (
+              <div style={{ padding: '14px', background: '#fef2f2', borderRadius: 'var(--radius)', color: '#991b1b', fontSize: '14px', marginBottom: '16px', textAlign: 'center' }}>
+                Something went wrong. Please try again or <a href="https://wa.me/2348096111333" style={{ fontWeight: 600, color: '#991b1b' }}>message us on WhatsApp</a>.
+              </div>
+            )}
             <Button variant="accent" type="submit" disabled={sending} style={{ width: '100%' }}>{sending ? 'Sending...' : 'Send my request'}</Button>
           </form>
         )}
