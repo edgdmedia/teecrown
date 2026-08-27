@@ -2,7 +2,7 @@ import type { Package, PricingRow, ItineraryDay } from '@/data/packages'
 import type { BlogPost } from '@/data/blog'
 import type { Testimonial } from '@/data/testimonials'
 
-const PAYLOAD_URL = process.env.PAYLOAD_URL!
+const PAYLOAD_URL = process.env.PAYLOAD_URL || 'https://dash.teecrownconsult.org'
 
 interface ApiMedia {
   url?: string | null
