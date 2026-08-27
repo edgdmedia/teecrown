@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { sendContactEmails } from '../hooks/sendContactEmails'
 
 export const ContactSubmissions: CollectionConfig = {
   slug: 'contact-submissions',
@@ -16,5 +15,4 @@ export const ContactSubmissions: CollectionConfig = {
     { name: 'message', type: 'textarea', required: true },
     { name: 'referral', type: 'text' },
   ],
-  hooks: { afterChange: [sendContactEmails] },
 }
