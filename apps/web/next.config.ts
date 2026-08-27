@@ -3,7 +3,10 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import path from "path";
 
 const nextConfig: NextConfig = {
-  outputFileTracingRoot: path.join(__dirname, "../.."),
+  output: "standalone",
+  turbopack: {
+    root: path.join(__dirname, "../.."),
+  },
 };
 
 export default nextConfig;

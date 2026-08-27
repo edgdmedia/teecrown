@@ -46,10 +46,10 @@ jobs:
         working-directory: apps/cms
         run: |
           mkdir -p deploy-bundle
-          cp -R .next/standalone/. deploy-bundle/
-          cp -R public deploy-bundle/
+          cp -RL .next/standalone/. deploy-bundle/
+          cp -RL public deploy-bundle/
           mkdir -p deploy-bundle/.next
-          cp -R .next/static deploy-bundle/.next/
+          cp -RL .next/static deploy-bundle/.next/
           cp package.json deploy-bundle/
           cp ecosystem.config.cjs deploy-bundle/
 
