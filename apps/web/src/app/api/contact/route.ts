@@ -6,13 +6,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
 
-    const { name, email, phone, service, message, referral } = body as {
+    const { name, email, message } = body as {
       name?: string
       email?: string
-      phone?: string
-      service?: string
       message?: string
-      referral?: string
     }
 
     if (!name || !email || !message) {
@@ -25,7 +22,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch(`${CMS_URL}/api/contact-submissions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, service, message, referral }),
+      body: JSON.stringify({ name, email, message }),
     })
 
     if (!res.ok) {
