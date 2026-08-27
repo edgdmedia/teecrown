@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       const text = await res.text()
       console.error("CMS contact submission failed:", res.status, text)
       return NextResponse.json(
-        { ok: false, error: "Submission failed" },
+        { ok: false, error: text || "Submission failed" },
         { status: 502 },
       )
     }
