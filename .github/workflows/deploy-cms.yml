@@ -45,11 +45,12 @@ jobs:
       - name: Prepare deploy bundle
         working-directory: apps/cms
         run: |
+          rm -rf deploy-bundle deploy-bundle.tar.gz
           mkdir -p deploy-bundle
-          cp -RL .next/standalone/. deploy-bundle/
-          cp -RL public deploy-bundle/
+          tar -C .next/standalone -chf - . | tar -C deploy-bundle -xf -
+          tar -C . -chf - public | tar -C deploy-bundle -xf -
           mkdir -p deploy-bundle/.next
-          cp -RL .next/static deploy-bundle/.next/
+          tar -C .next -chf - static | tar -C deploy-bundle/.next -xf -
           cp package.json deploy-bundle/
           cp ecosystem.config.cjs deploy-bundle/
 
