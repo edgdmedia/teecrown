@@ -1,4 +1,5 @@
 import path from 'path'
+import { sql } from '@payloadcms/db-postgres'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -33,6 +34,39 @@ export default buildConfig({
     },
   },
   collections: [Users, Media, Posts, TourPackages, Testimonials, ContactSubmissions],
+  endpoints: [
+    {
+      path: '/contact',
+      method: 'post',
+      handler: async (req) => {
+        try {
+          const body = await req.json()
+          const { name, email, message } = body as {
+            name?: string
+            email?: string
+            message?: string
+          }
+
+          if (!name || !email || !message) {
+            return Response.json(
+              { ok: false, error: 'Name, email and message are required' },
+              { status: 400 },
+            )
+          }
+
+          await req.payload.db.drizzle.execute(sql`
+            insert into "contact_submissions" ("name", "email", "message")
+            values (${name}, ${email}, ${message})
+          `)
+
+          return Response.json({ ok: true })
+        } catch (error) {
+          console.error('CMS contact endpoint failed:', error)
+          return Response.json({ ok: false, error: 'Something went wrong.' }, { status: 500 })
+        }
+      },
+    },
+  ],
   editor: lexicalEditor(),
   email: nodemailerAdapter({
     defaultFromAddress: process.env.FROM_EMAIL || 'noreply@teecrownconsult.org',
