@@ -9,7 +9,7 @@ export const ContactSubmissions: CollectionConfig = {
   },
   fields: [
     { name: 'name', type: 'text', required: true },
-    { name: 'email', type: 'email', required: true },
+    { name: 'email', type: 'text', required: true },
     { name: 'phone', type: 'text' },
     { name: 'service', type: 'text' },
     { name: 'message', type: 'textarea', required: true },
