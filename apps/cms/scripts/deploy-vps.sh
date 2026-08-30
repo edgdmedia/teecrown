@@ -39,9 +39,11 @@ cp ecosystem.config.cjs "$CURRENT_DIR/"
 rm -rf "$CURRENT_DIR/media"
 ln -s "$MEDIA_DIR" "$CURRENT_DIR/media"
 
+node -e "const fs=require('fs');const path=process.argv[1];for(const line of fs.readFileSync(path,'utf8').split(/\\r?\\n/)){if(!line||line.trim().startsWith('#'))continue;const i=line.indexOf('=');if(i===-1)continue;const key=line.slice(0,i);const value=line.slice(i+1);process.stdout.write(key+'='+JSON.stringify(value)+'\n')}" "$ENV_FILE" > /tmp/teecrown-cms-env
 set -a
-. "$ENV_FILE"
+. /tmp/teecrown-cms-env
 set +a
+rm -f /tmp/teecrown-cms-env
 
 pnpm run deploy:database
 
