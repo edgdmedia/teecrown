@@ -32,37 +32,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate types and importmap
-        working-directory: apps/cms
-        run: |
-          pnpm run generate:importmap
-          pnpm run generate:types
+      - name: Archive source for VPS build
+        run: git archive --format=tar.gz --output=repo.tar.gz HEAD
 
-      - name: Build
-        working-directory: apps/cms
-        run: pnpm run build
-
-      - name: Prepare deploy bundle
-        working-directory: apps/cms
-        run: |
-          rm -rf deploy-bundle deploy-bundle.tar.gz
-          mkdir -p deploy-bundle
-          tar -C .next/standalone -chf - . | tar -C deploy-bundle -xf -
-          tar -C . -chf - public | tar -C deploy-bundle -xf -
-          mkdir -p deploy-bundle/.next
-          tar -C .next -chf - static | tar -C deploy-bundle/.next -xf -
-          cp package.json deploy-bundle/
-          cp ecosystem.config.cjs deploy-bundle/
-
-      - name: Upload to VPS
+      - name: Upload source to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "apps/cms/deploy-bundle/*"
-          target: "/home/teecrownconsult/apps/cms/deploy-staging"
-          strip_components: 3
+          source: "repo.tar.gz"
+          target: "/home/teecrownconsult/apps/cms"
 
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1
@@ -73,29 +53,13 @@ jobs:
           script: |
             set -e
             APP_ROOT="/home/teecrownconsult/apps/cms"
-            CURRENT_DIR="$APP_ROOT/current"
-            STAGING_DIR="$APP_ROOT/deploy-staging"
-            SHARED_DIR="$APP_ROOT/shared"
-
-            # Replace current with staging
-            rm -rf "$CURRENT_DIR.old"
-            mv "$CURRENT_DIR" "$CURRENT_DIR.old" 2>/dev/null || true
-            mkdir -p "$CURRENT_DIR"
-            cp -R "$STAGING_DIR/." "$CURRENT_DIR/"
-            cp "$SHARED_DIR/.env.production" "$CURRENT_DIR/" 2>/dev/null || true
-
-            # Symlink media
-            rm -rf "$CURRENT_DIR/media"
-            ln -s "$SHARED_DIR/media" "$CURRENT_DIR/media"
-
-            # Restart PM2 — delete first to avoid stale cached state
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             nvm use 24.15.0
-            pm2 delete teecrownconsult-cms 2>/dev/null || true
-            pm2 start "$CURRENT_DIR/ecosystem.config.cjs"
-            pm2 save
-
-            # Cleanup
-            rm -rf "$STAGING_DIR"
-            rm -rf "$CURRENT_DIR.old"
+            RELEASE_DIR="$APP_ROOT/repo-src"
+            rm -rf "$RELEASE_DIR"
+            mkdir -p "$RELEASE_DIR"
+            tar -xzf "$APP_ROOT/repo.tar.gz" -C "$RELEASE_DIR"
+            cd "$RELEASE_DIR/apps/cms"
+            bash scripts/deploy-vps.sh
+            rm -f "$APP_ROOT/repo.tar.gz"
