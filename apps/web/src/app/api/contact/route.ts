@@ -19,11 +19,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const res = await fetch(`${CMS_URL}/my-route`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, message }),
-    })
+    const url = new URL(`${CMS_URL}/my-route`)
+    url.searchParams.set("name", name)
+    url.searchParams.set("email", email)
+    url.searchParams.set("message", message)
+
+    const res = await fetch(url, { method: "GET" })
 
     if (!res.ok) {
       const text = await res.text()

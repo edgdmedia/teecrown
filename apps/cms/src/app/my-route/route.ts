@@ -2,26 +2,15 @@ import { sql } from '@payloadcms/db-postgres'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
-export const GET = async () => {
-  return Response.json({
-    message: 'This is an example of a custom route.',
-  })
-}
-
-export const POST = async (request: Request) => {
+export const GET = async (request: Request) => {
   try {
-    const body = await request.json()
-    const { name, email, message } = body as {
-      name?: string
-      email?: string
-      message?: string
-    }
+    const { searchParams } = new URL(request.url)
+    const name = searchParams.get('name') || undefined
+    const email = searchParams.get('email') || undefined
+    const message = searchParams.get('message') || undefined
 
     if (!name || !email || !message) {
-      return Response.json(
-        { ok: false, error: 'Name, email and message are required' },
-        { status: 400 },
-      )
+      return Response.json({ message: 'This is an example of a custom route.' })
     }
 
     const payload = await getPayload({
