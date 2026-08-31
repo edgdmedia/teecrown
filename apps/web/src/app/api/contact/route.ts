@@ -19,12 +19,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const url = new URL(`${CMS_URL}/my-route`)
-    url.searchParams.set("name", name)
-    url.searchParams.set("email", email)
-    url.searchParams.set("message", message)
-
-    const res = await fetch(url, { method: "GET" })
+    const res = await fetch(`${CMS_URL}/api/contact-submissions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, message }),
+    })
 
     if (!res.ok) {
       const text = await res.text()
