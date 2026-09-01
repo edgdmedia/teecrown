@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { triggerRevalidation, triggerRevalidationOnDelete } from '../hooks/triggerRevalidation'
+import { triggerRevalidation } from '../hooks/triggerRevalidation'
 import { adminsAndEditors, adminsOnly } from '../lib/access'
 
 export const Posts: CollectionConfig = {
@@ -29,8 +29,5 @@ export const Posts: CollectionConfig = {
     { name: 'excerpt', type: 'textarea', required: true },
     { name: 'body', type: 'richText' },
   ],
-  hooks: {
-    afterChange: [triggerRevalidation],
-    afterDelete: [triggerRevalidationOnDelete],
-  },
+  hooks: { afterChange: [triggerRevalidation] },
 }

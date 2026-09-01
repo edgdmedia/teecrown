@@ -52,6 +52,3 @@ node_modules/
 # OpenNext
 .open-next
 .wrangler
-# local e2e credentials
-.env.e2e
-playwright-report-prod/
