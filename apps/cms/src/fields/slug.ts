@@ -1,26 +1,23 @@
 import type { Field } from 'payload'
 
-/** "Turkey Tour 2026!" -> "turkey-tour-2026", "Zürich" -> "zurich" */
-export function slugify(input: string): string {
-  return input
-    .normalize('NFD') // split accented letters into base + combining mark
-    .replace(/[̀-ͯ]/g, '') // drop the marks, keeping the base letter
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '') // drop remaining punctuation
-    .replace(/[\s_-]+/g, '-') // whitespace and underscores become dashes
-    .replace(/^-+|-+$/g, '') // no leading or trailing dashes
-}
+import { slugify } from './slugify'
+
+export { slugify }
 
 /**
- * A slug that fills itself in from another field (the title, by default) when
- * left blank, and normalises whatever is typed otherwise.
+ * A slug that fills itself in from another field (the title, by default).
  *
- * `beforeValidate` runs before `required` is enforced, so an editor can save
- * with the slug empty and still pass validation.
+ * Two layers, deliberately:
  *
- * Lives in the sidebar: it is a URL detail, not something to meet before the
- * title when writing a post.
+ * - SlugField (admin component) mirrors the title as you type on a NEW
+ *   document, and backs off as soon as you edit the field yourself.
+ * - The `beforeValidate` hook below is the safety net: it normalises whatever
+ *   was typed and derives a slug from the title if the field is still blank at
+ *   save time. It runs before `required` is enforced, so saving with it empty
+ *   still passes, and it covers API writes where no admin UI is involved.
+ *
+ * Sits in the sidebar: it is a URL detail, not the first thing you should meet
+ * when writing a post.
  */
 export const slugField = (from: string = 'title'): Field => ({
   name: 'slug',
@@ -29,7 +26,10 @@ export const slugField = (from: string = 'title'): Field => ({
   unique: true,
   admin: {
     position: 'sidebar',
-    description: 'Used in the page URL. Leave blank to generate it from the title.',
+    description: 'Used in the page URL. Generated from the title — edit if you need to.',
+    components: {
+      Field: '/fields/SlugField#SlugField',
+    },
   },
   hooks: {
     beforeValidate: [
