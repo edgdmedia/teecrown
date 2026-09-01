@@ -23,7 +23,8 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation node .next/standalone/server.js",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "test:e2e:prod": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.prod.config.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.82.1",
