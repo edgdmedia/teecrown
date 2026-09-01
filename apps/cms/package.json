@@ -4,14 +4,6 @@
   "description": "Payload CMS for teecrownconsult on a VPS with Postgres",
   "license": "MIT",
   "type": "module",
-  "pnpm": {
-    "//": "Mirrors onlyBuiltDependencies in the root pnpm-workspace.yaml. The VPS deploy installs with --ignore-workspace (see scripts/deploy-vps.sh), which means pnpm never reads that file — without this, sharp and friends are blocked as ignored build scripts and the install exits 1.",
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "sharp",
-      "unrs-resolver"
-    ]
-  },
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "deploy": "pnpm run build",
