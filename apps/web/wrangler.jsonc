@@ -9,30 +9,6 @@
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
-	"services": [
-		{
-			// Self-reference binding; "service" must match "name" above.
-			// Required for on-demand revalidation to call back into the worker.
-			"binding": "WORKER_SELF_REFERENCE",
-			"service": "teecrownconsult"
-		}
-	],
-	"r2_buckets": [
-		{
-			// Incremental cache: stores the rendered ISR pages and the Data Cache.
-			"binding": "NEXT_INC_CACHE_R2_BUCKET",
-			"bucket_name": "teecrownconsult-opennext-cache"
-		}
-	],
-	"d1_databases": [
-		{
-			// Tag cache. D1 is strongly consistent, so revalidateTag('tours')
-			// takes effect immediately rather than eventually (as KV would).
-			"binding": "NEXT_TAG_CACHE_D1",
-			"database_name": "teecrownconsult-tag-cache",
-			"database_id": "a6fbdbdb-6201-44aa-b373-f0634ba86e4c"
-		}
-	],
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"

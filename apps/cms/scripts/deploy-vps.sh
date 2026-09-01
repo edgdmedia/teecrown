@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Build and run in place.
+#
+# The previous version built into .next/standalone, tarred that into a `release`
+# directory and swapped it over `current`. With pnpm, standalone's node_modules
+# is three relative symlinks into the store; moving that tree (and flattening it
+# one level shallower) left them dangling, so the app died on boot with
+# "Cannot find module 'next'" while the deploy still reported success.
+#
+# Now the extracted repo IS the running app. node_modules never moves.
+
 APP_ROOT="/home/teecrownconsult/apps/cms"
-CURRENT_DIR="$APP_ROOT/current"
-RELEASE_DIR="$APP_ROOT/release"
 SHARED_DIR="$APP_ROOT/shared"
 MEDIA_DIR="$SHARED_DIR/media"
 ENV_FILE="$SHARED_DIR/.env.production"
+
+# The CMS package this script lives in, whatever it was extracted to.
+CMS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "Missing env file: $ENV_FILE"
@@ -19,41 +30,22 @@ if [ -s "$NVM_DIR/nvm.sh" ]; then
   nvm use 24.15.0
 fi
 
-mkdir -p "$APP_ROOT" "$SHARED_DIR" "$MEDIA_DIR"
+mkdir -p "$SHARED_DIR" "$MEDIA_DIR"
 
-# --ignore-workspace is required, not cosmetic.
-#
-# next.config.mjs sets `outputFileTracingRoot: __dirname` (= apps/cms). A normal
-# workspace install puts the real packages in <repo-root>/node_modules/.pnpm and
-# leaves apps/cms/node_modules/next as a symlink pointing OUTSIDE that tracing
-# root. Next then emits `.next/standalone/node_modules/{next,react,graphql}` as
-# dangling symlinks and copies no actual files — a ~9MB standalone that dies on
-# boot with "Cannot find module 'next'".
-#
-# With --ignore-workspace the real packages land in apps/cms/node_modules/.pnpm,
-# inside the tracing root, so the standalone output contains them (~82MB) and
-# the relative symlinks still resolve after the tar copy below.
-pnpm install --ignore-workspace --no-frozen-lockfile
+cd "$CMS_DIR"
+
+pnpm install --no-frozen-lockfile
 pnpm run generate:importmap
 pnpm run generate:types
 pnpm run build
 
-rm -rf "$RELEASE_DIR"
-mkdir -p "$RELEASE_DIR"
+# Uploads live outside the deploy directory so they survive redeploys.
+rm -rf "$CMS_DIR/media"
+ln -s "$MEDIA_DIR" "$CMS_DIR/media"
 
-tar -C .next/standalone -cf - . | tar -C "$RELEASE_DIR" -xf -
-tar -C . -cf - public | tar -C "$RELEASE_DIR" -xf -
-mkdir -p "$RELEASE_DIR/.next"
-tar -C .next -cf - static | tar -C "$RELEASE_DIR/.next" -xf -
-cp package.json "$RELEASE_DIR/"
-cp ecosystem.config.cjs "$RELEASE_DIR/"
-
-rm -rf "$CURRENT_DIR"
-mv "$RELEASE_DIR" "$CURRENT_DIR"
-
-rm -rf "$CURRENT_DIR/media"
-ln -s "$MEDIA_DIR" "$CURRENT_DIR/media"
-
+# Export .env.production into this shell so pm2 inherits it. Parsed by node
+# rather than sourced directly: unquoted values containing spaces (e.g.
+# EMAIL_FROM_NAME=TeeCrown Consult) are word-split by the shell and blow up.
 node -e "const fs=require('fs');const path=process.argv[1];for(const line of fs.readFileSync(path,'utf8').split(/\\r?\\n/)){if(!line||line.trim().startsWith('#'))continue;const i=line.indexOf('=');if(i===-1)continue;const key=line.slice(0,i);const value=line.slice(i+1);process.stdout.write(key+'='+JSON.stringify(value)+'\n')}" "$ENV_FILE" > /tmp/teecrown-cms-env
 set -a
 . /tmp/teecrown-cms-env
@@ -62,26 +54,16 @@ rm -f /tmp/teecrown-cms-env
 
 pnpm run deploy:database
 
-# Fail fast if the standalone output is missing its dependencies, rather than
-# swapping a release that cannot boot. This is the exact failure the
-# --ignore-workspace note above describes.
-if [ ! -e "$CURRENT_DIR/node_modules/next/package.json" ]; then
-  echo "FATAL: $CURRENT_DIR/node_modules/next does not resolve."
-  echo "The standalone build shipped dangling symlinks; refusing to restart."
-  exit 1
-fi
-
 pm2 delete teecrownconsult-cms 2>/dev/null || true
-pm2 start "$CURRENT_DIR/ecosystem.config.cjs"
+pm2 start "$CMS_DIR/ecosystem.config.cjs" --update-env
 pm2 save
 
-# pm2 start exits 0 even when the app immediately crash-loops, which is how a
-# 15-restart "errored" process previously passed as a green deploy. Poll the
-# real endpoint before declaring success.
-echo "Waiting for CMS to answer on 127.0.0.1:3000 ..."
+# `pm2 start` exits 0 even when the app immediately crash-loops. That is how a
+# dead CMS passed as a green deploy for two hours. Poll the real endpoint.
+echo "Waiting for CMS on 127.0.0.1:3000 ..."
 for i in $(seq 1 30); do
   if curl -fsS -o /dev/null --max-time 5 "http://127.0.0.1:3000/api/tour-packages?limit=1"; then
-    echo "CMS is up (after ${i} attempt(s))."
+    echo "CMS healthy after ${i} attempt(s)."
     exit 0
   fi
   sleep 2
