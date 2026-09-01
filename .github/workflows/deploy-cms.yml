@@ -58,15 +58,19 @@ jobs:
             nvm use 24.15.0
 
             # The extracted repo IS the running app - build and run in place.
-            # Deliberately NOT wiped between deploys: node_modules and .next are
-            # kept, which is both what makes in-place running work and what makes
-            # rebuilds fast. The archive is overlaid on top.
             #
-            # Trade-off: a source file deleted in git lingers here. If that ever
-            # matters, delete APP_DIR and let the next deploy repopulate it.
-            APP_DIR="$APP_ROOT/app"
-            mkdir -p "$APP_DIR"
-            tar -xzf "$APP_ROOT/repo.tar.gz" -C "$APP_DIR"
-            cd "$APP_DIR/apps/cms"
+            # Extraction root is $HOME, so the repo's own apps/cms path lands at
+            # /home/teecrownconsult/apps/cms - the app directory itself, with no
+            # extra nesting. shared/ (env + uploads) is untracked and therefore
+            # untouched by extraction, so its paths stay exactly as they were.
+            #
+            # Deliberately NOT wiped between deploys: node_modules and .next are
+            # kept, which is what makes in-place running work and rebuilds fast.
+            # The archive is overlaid on top.
+            #
+            # Trade-off: a source file deleted in git lingers. If that matters,
+            # remove apps/cms/.next and the stale file by hand.
+            tar -xzf "$APP_ROOT/repo.tar.gz" -C "$HOME"
+            cd "$APP_ROOT"
             bash scripts/deploy-vps.sh
             rm -f "$APP_ROOT/repo.tar.gz"
