@@ -29,10 +29,10 @@ pnpm run build
 rm -rf "$RELEASE_DIR"
 mkdir -p "$RELEASE_DIR"
 
-cp -R .next/standalone/. "$RELEASE_DIR/"
-cp -R public "$RELEASE_DIR/"
+tar -C .next/standalone -cf - . | tar -C "$RELEASE_DIR" -xf -
+tar -C . -cf - public | tar -C "$RELEASE_DIR" -xf -
 mkdir -p "$RELEASE_DIR/.next"
-cp -R .next/static "$RELEASE_DIR/.next/"
+tar -C .next -cf - static | tar -C "$RELEASE_DIR/.next" -xf -
 cp package.json "$RELEASE_DIR/"
 cp ecosystem.config.cjs "$RELEASE_DIR/"
 
@@ -50,5 +50,6 @@ rm -f /tmp/teecrown-cms-env
 
 pnpm run deploy:database
 
-pm2 startOrReload "$CURRENT_DIR/ecosystem.config.cjs" --update-env
+pm2 delete teecrownconsult-cms 2>/dev/null || true
+pm2 start "$CURRENT_DIR/ecosystem.config.cjs"
 pm2 save
