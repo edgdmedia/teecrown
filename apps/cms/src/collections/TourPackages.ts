@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { triggerRevalidation, triggerRevalidationOnDelete } from '../hooks/triggerRevalidation'
 import { adminsAndEditors, adminsOnly } from '../lib/access'
+import { slugField } from '../fields/slug'
 
 export const TourPackages: CollectionConfig = {
   slug: 'tour-packages',
@@ -13,7 +14,7 @@ export const TourPackages: CollectionConfig = {
   },
   fields: [
     { name: 'title', type: 'text', required: true },
-    { name: 'slug', type: 'text', required: true, unique: true },
+    slugField(),
     { name: 'location', type: 'text', required: true },
     {
       name: 'imageMedia',
