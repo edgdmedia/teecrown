@@ -1,6 +1,6 @@
-// The app is built and run in place at APP_DIR — no release/current swap, so
-// node_modules is never relocated. `cwd` is the CMS package inside the extracted
-// repo.
+// The app is built and run in place — no release/current swap, so node_modules
+// is never relocated. The repo is extracted with $HOME as the root, so its own
+// apps/cms path is the app directory: /home/teecrownconsult/apps/cms.
 //
 // Invoking next's binary directly avoids depending on pnpm/corepack being on
 // PATH inside the pm2 daemon.
@@ -12,7 +12,7 @@ module.exports = {
   apps: [
     {
       name: 'teecrownconsult-cms',
-      cwd: '/home/teecrownconsult/apps/cms/app/apps/cms',
+      cwd: '/home/teecrownconsult/apps/cms',
       script: 'node_modules/next/dist/bin/next',
       args: 'start -p 3000 -H 127.0.0.1',
       instances: 1,
