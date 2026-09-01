@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { triggerRevalidation, triggerRevalidationOnDelete } from '../hooks/triggerRevalidation'
 import { adminsAndEditors, adminsOnly } from '../lib/access'
+import { slugField } from '../fields/slug'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -12,9 +13,9 @@ export const Posts: CollectionConfig = {
     delete: adminsOnly,
   },
   fields: [
-    { name: 'slug', type: 'text', required: true, unique: true },
-    { name: 'category', type: 'text', required: true },
     { name: 'title', type: 'text', required: true },
+    { name: 'category', type: 'text', required: true },
+    slugField(),
     {
       name: 'imageMedia',
       type: 'upload',
