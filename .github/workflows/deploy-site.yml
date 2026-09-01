@@ -44,3 +44,13 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Wrangler detects an OpenNext project and delegates to
+          # `opennextjs-cloudflare deploy`, which then tries to pre-populate the
+          # remote R2 incremental cache. That path shells wrangler out again from
+          # the monorepo root and fails under a CI API token with
+          # "Could not determine Cloudflare auth credentials after login".
+          # This flag is what OpenNext itself sets to stop the delegation, so the
+          # step performs a plain `wrangler deploy`.
+          # Trade-off: the R2 cache is not warmed at deploy time. It fills lazily
+          # on first request per page, which costs one uncached render each.
+          OPEN_NEXT_DEPLOY: "true"
