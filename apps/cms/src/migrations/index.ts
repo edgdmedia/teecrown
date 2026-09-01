@@ -1,5 +1,6 @@
 import * as migration_20260825_104232_init_postgres from './20260825_104232_init_postgres';
 import * as migration_20260825_184500_drop_legacy_image_fields from './20260825_184500_drop_legacy_image_fields';
+import * as migration_20260826_000000_add_contact_submission_fields from './20260826_000000_add_contact_submission_fields';
 
 export const migrations = [
   {
@@ -11,5 +12,10 @@ export const migrations = [
     up: migration_20260825_184500_drop_legacy_image_fields.up,
     down: migration_20260825_184500_drop_legacy_image_fields.down,
     name: '20260825_184500_drop_legacy_image_fields'
+  },
+  {
+    up: migration_20260826_000000_add_contact_submission_fields.up,
+    down: migration_20260826_000000_add_contact_submission_fields.down,
+    name: '20260826_000000_add_contact_submission_fields'
   },
 ];

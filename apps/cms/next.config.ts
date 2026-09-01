@@ -9,6 +9,7 @@ type WebpackConfigWithAliases = {
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  outputFileTracingRoot: __dirname,
   images: {
     localPatterns: [
       {
