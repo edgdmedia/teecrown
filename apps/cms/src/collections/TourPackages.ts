@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { triggerRevalidation } from '../hooks/triggerRevalidation'
+import { triggerRevalidation, triggerRevalidationOnDelete } from '../hooks/triggerRevalidation'
 import { adminsAndEditors, adminsOnly } from '../lib/access'
 
 export const TourPackages: CollectionConfig = {
@@ -57,5 +57,8 @@ export const TourPackages: CollectionConfig = {
     ] },
     { name: 'hashtags', type: 'array', fields: [{ name: 'item', type: 'text', required: true }] },
   ],
-  hooks: { afterChange: [triggerRevalidation] },
+  hooks: {
+    afterChange: [triggerRevalidation],
+    afterDelete: [triggerRevalidationOnDelete],
+  },
 }
